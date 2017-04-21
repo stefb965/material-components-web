@@ -41,7 +41,6 @@ export default class MDCTabFoundation extends MDCFoundation {
     this.computedLeft_ = 0;
     this.isActive_ = false;
     this.preventDefaultOnClick_ = false;
-    this.preventDefaultHandler_ = (evt) => evt.preventDefault();
 
     this.clickHandler_ = (evt) => {
       if (this.preventDefaultOnClick_) {

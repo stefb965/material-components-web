@@ -19,15 +19,35 @@
 @import "@material/theme/mixins";
 @import "@material/ripple/mixins";
 @import "@material/rtl/mixins";
-@import "./variables";
-@import "./mixins";
+
+$mdc-tabs-text-color: rgba(black, .54);
+$mdc-tabs-active-text-color: rgba(black, .87);
+
+@mixin mdc-tabs-icon-tab-content {
+  display: block;
+  margin: 0 auto;
+}
+
+@mixin mdc-tabs-anchor-reset {
+  color: $mdc-tabs-text-color;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: $mdc-tabs-active-text-color;
+  }
+
+  &:focus {
+    outline-color: $mdc-tabs-text-color;
+  }
+}
 
 // postcss-bem-linter: define tab
 .mdc-tab {
   @include mdc-ripple-base;
   @include mdc-ripple-bg((pseudo: "::before"));
   @include mdc-ripple-fg((pseudo: "::after"));
-  @include mdc-anchor-reset;
+  @include mdc-tabs-anchor-reset;
   @include mdc-typography(body2);
 
   position: relative;
@@ -56,7 +76,7 @@
 
   // postcss-bem-linter: ignore
   &__icon {
-    @include mdc-icon-tab-content;
+    @include mdc-tabs-icon-tab-content;
 
     width: 24px;
     height: 24px;
@@ -68,7 +88,7 @@
   }
 
   &__icon-text {
-    @include mdc-icon-tab-content;
+    @include mdc-tabs-icon-tab-content;
   }
 
   // postcss-bem-linter: ignore
@@ -124,10 +144,55 @@
 }
 
 .mdc-tab--active {
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
   @include mdc-theme-prop(color, text-primary-on-light);
+  @include mdc-theme-prop(border-bottom-color, text-primary-on-light);
 
   @include mdc-theme-dark(".mdc-tabs") {
     @include mdc-theme-prop(color, text-primary-on-dark);
+    @include mdc-theme-prop(border-bottom-color, text-primary-on-dark);
   }
 }
- // postcss-bem-linter: end
+
+.mdc-toolbar {
+  .mdc-tabs:not(.mdc-tabs-upgraded) > .mdc-tab--active {
+    @include mdc-theme-prop(border-bottom-color, text-primary-on-primary);
+
+    @include mdc-theme-dark(".mdc-tabs") {
+      @include mdc-theme-prop(border-bottom-color, text-primary-on-dark);
+    }
+  }
+}
+
+.mdc-toolbar.mdc-theme--accent-bg {
+  .mdc-tabs:not(.mdc-tabs-upgraded) > .mdc-tab--active {
+    @include mdc-theme-prop(border-bottom-color, primary);
+
+    @include mdc-theme-dark(".mdc-tabs") {
+      @include mdc-theme-prop(border-bottom-color, text-primary-on-dark);
+    }
+  }
+}
+
+.mdc-tabs:not(.mdc-tabs-upgraded).mdc-tabs--indicator-primary {
+  .mdc-tab--active {
+    @include mdc-theme-prop(border-bottom-color, primary);
+
+    @include mdc-theme-dark(".mdc-tabs") {
+      @include mdc-theme-prop(border-bottom-color, text-primary-on-dark);
+    }
+  }
+}
+
+.mdc-tabs:not(.mdc-tabs-upgraded).mdc-tabs--indicator-accent {
+  .mdc-tab--active {
+    @include mdc-theme-prop(border-bottom-color, accent);
+
+    @include mdc-theme-dark(".mdc-tabs") {
+      @include mdc-theme-prop(border-bottom-color, text-secondary-on-dark);
+    }
+  }
+}
+
+// postcss-bem-linter: end

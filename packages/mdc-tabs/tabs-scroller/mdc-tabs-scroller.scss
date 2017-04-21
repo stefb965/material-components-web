@@ -17,7 +17,6 @@
 @import "@material/animation/functions";
 @import "@material/theme/mixins";
 @import "@material/rtl/mixins";
-@import "./variables";
 
 // postcss-bem-linter: define tabs-scroller
 .mdc-tabs-scroller {
@@ -40,9 +39,9 @@
     }
   }
 
-  &__indicator {
-    @include mdc-anchor-reset;
+  $mdc-tabs-scroller-indicator-width: 48px;
 
+  &__indicator {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,8 +55,6 @@
 
       @include mdc-theme-prop(color, text-primary-on-dark);
     }
-
-    @include mdc-anchor-reset;
 
     &__inner {
       text-decoration: inherit;

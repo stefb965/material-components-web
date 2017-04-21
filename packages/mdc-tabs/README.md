@@ -12,9 +12,180 @@ npm install --save @material/tabs
 ## Tabs usage
 
 Tabs allow users to explore and switch between different views.
+MDC-Tabs can be used as a CSS only component, or a more dynamic JavaScript component.
+There are three different permutations of tab content. These include text, icon-only, and text with icon. An example of each is available on the demo site.
 
+#### Text Tabs
 ```html
 <nav id="basic-tabs" class="mdc-tabs">
+  <a class="mdc-tab mdc-tab--active" href="#one">Home</a>
+  <a class="mdc-tab" href="#two">Merchandise</a>
+  <a class="mdc-tab" href="#three">About Us</a>
+  <span class="mdc-tabs__indicator"></span>
+</nav>
+```
+
+#### Icon Tabs
+```html
+<nav class="mdc-tabs mdc-tabs--icon-tabs">
+  <a class="mdc-tab mdc-tab--active" href="#recents">
+    <i class="material-icons mdc-tab__icon" aria-label="Recents">phone</i>
+  </a>
+  <a class="mdc-tab" href="#favorites">
+    <i class="material-icons mdc-tab__icon" aria-label="Favorites">favorite</i>
+  </a>
+  <a class="mdc-tab" href="#nearby">
+    <i class="material-icons mdc-tab__icon" aria-label="nearby">person_pin</i>
+  </a>
+  <span class="mdc-tabs__indicator"></span>
+</nav>
+```
+
+#### Text + Icon Tabs
+```html
+<nav id="icon-text-tabs" class="mdc-tabs mdc-tabs--icons-with-text">
+  <a class="mdc-tab mdc-tab--active" href="#recents">
+    <i class="material-icons mdc-tab__icon" aria-hidden="true">phone</i>
+    <span class="mdc-tab__icon-text">Recents</span>
+  </a>
+  <a class="mdc-tab" href="#favorites">
+    <i class="material-icons mdc-tab__icon" aria-hidden="true">favorite</i>
+    <span class="mdc-tab__icon-text">Favorites</span>
+  </a>
+  <a class="mdc-tab" href="#nearby">
+    <i class="material-icons mdc-tab__icon" aria-hidden="true">person_pin</i>
+    <span class="mdc-tab__icon-text">Nearby</span>
+  </a>
+  <span class="mdc-tabs__indicator"></span>
+</nav>
+```
+
+#### RTL Support
+
+Tabs will reverse their order if they are placed within an ancestor element containing a dir attribute with value "rtl". This applies to all tabs regardless of type.
+
+```html
+<html dir="rtl">
+  <!--...-->
+  <nav id="basic-tabs" class="mdc-tabs">
+    <a class="mdc-tab mdc-tab--active" href="#one">Home</a>
+    <a class="mdc-tab" href="#two">Merchandise</a>
+    <a class="mdc-tab" href="#three">About Us</a>
+    <span class="mdc-tabs__indicator"></span>
+  </nav>
+</html>
+```
+
+#### Dark Mode Support
+
+Like other MDC-Web components, tabs support dark mode either when an mdc-tab--theme-dark class is attached to the root element, or the element has an ancestor with class mdc-theme--dark.
+
+```html
+<html class="mdc-theme--dark">
+  <!-- ... -->
+  <nav id="basic-tabs" class="mdc-tabs">
+    <a class="mdc-tab mdc-tab--active" href="#one">Home</a>
+    <a class="mdc-tab" href="#two">Merchandise</a>
+    <a class="mdc-tab" href="#three">About Us</a>
+    <span class="mdc-tabs__indicator"></span>
+  </nav>
+</html>
+```
+
+
+### Dynamic view switching
+
+While facilitating the view switching is left up to the developer, the demo site provides a minimal example of how to do so using JavaScript, also shown below.
+
+#### Markup:
+```html
+<section id="dynamic-demo-toolbar">  
+  <nav id="dynamic-tabs" class="mdc-tabs mdc-tabs--indicator-accent" role="tablist">
+    <a role="tab" aria-controls="panel-1"
+       class="mdc-tab mdc-tab--active" href="#panel-1">Item One</a>
+    <a role="tab" aria-controls="panel-2"
+       class="mdc-tab" href="#panel-2">Item Two</a>
+    <a role="tab" aria-controls="panel-3"
+       class="mdc-tab" href="#panel-3">Item Three</a>
+    <span class="mdc-tabs__indicator"></span>
+  </nav>
+</section>
+<section>
+  <div class="panels">
+    <p class="panel active" id="panel-1" role="tabpanel" aria-hidden="false">Item One</p>
+    <p class="panel" id="panel-2" role="tabpanel" aria-hidden="true">Item Two</p>
+    <p class="panel" id="panel-3" role="tabpanel" aria-hidden="true">Item Three</p>
+  </div>
+  <div class="dots">
+    <a class="dot active" data-trigger="panel-1" href="#panel-1"></a>
+    <a class="dot" data-trigger="panel-2" href="#panel-2"></a>
+    <a class="dot" data-trigger="panel-3" href="#panel-3"></a>
+  </div>
+</section>
+```
+
+#### Script:
+```js
+var dynamicTabs = window.dynamicTabs = new mdc.tabs.MDCTabs(document.querySelector('#dynamic-tabs'));
+var dots = document.querySelector('.dots');
+var panels = document.querySelector('.panels');
+
+dynamicTabs.preventDefaultOnClick = true;
+
+function updateDot(index) {
+  var activeDot = dots.querySelector('.dot.active');
+  if (activeDot) {
+    activeDot.classList.remove('active');
+  }
+  var newActiveDot = dots.querySelector('.dot:nth-child(' + (index + 1) + ')');
+  if (newActiveDot) {
+    newActiveDot.classList.add('active');
+  }
+}
+
+function updatePanel(index) {
+  var activePanel = panels.querySelector('.panel.active');
+  if (activePanel) {
+    activePanel.classList.remove('active');
+  }
+  var newActivePanel = panels.querySelector('.panel:nth-child(' + (index + 1) + ')');
+  if (newActivePanel) {
+    newActivePanel.classList.add('active');
+  }
+}
+
+dynamicTabs.root_.addEventListener('MDCTabs:change', function ({detail: tabs}) {
+  var nthChildIndex = tabs.activeTabIndex;
+
+  updatePanel(nthChildIndex);
+  updateDot(nthChildIndex);
+});
+
+dots.addEventListener('click', function (evt) {
+  if (!evt.target.classList.contains('dot')) {
+    return;
+  }
+
+  evt.preventDefault();
+
+  var dotIndex = [].slice.call(dots.querySelectorAll('.dot')).indexOf(evt.target);
+
+  if (dotIndex >= 0) {
+    dynamicTabs.foundation_.switchToTabAtIndex(dotIndex, false);
+  }
+  updatePanel(dotIndex);
+  updateDot(dotIndex);
+})
+```
+
+### Using the CSS-Only Component
+
+`mdc-tabs` ships with css for styling a tabs layout according to the Material Design spec.
+To use CSS only tabs, simply use the available class names. Note the available `mdc-tab--active` modifier class.
+This is used to denote the currently active tab.
+
+```html
+<nav class="mdc-tabs">
   <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
   <a class="mdc-tab" href="#two">Item Two</a>
   <a class="mdc-tab" href="#three">Three</a>
@@ -22,12 +193,11 @@ Tabs allow users to explore and switch between different views.
 </nav>
 ```
 
-### Using the Component
+### Using the JavaScript Component
 
-MDC Tabs ships with a Component / Foundation combo for MDC Tab (a tab), MDC Tabs
-(a collection of items of type MDC Tab), and MDC Tabs Scroller (used when
-MDC Tabs overflows the window). This allows for frameworks to richly integrate the
-correct tab behaviors into idiomatic components.
+`mdc-tabs` ships with a Component / Foundation combo for `mdc-tab` (a tab), `mdc-tabs`
+(a collection of type MDC-Tab), and `mdc-tabs-scroller` (used when one or more tabs in
+`mdc-tabs` overflows the available width).
 
 #### Including in code
 
@@ -42,15 +212,15 @@ import {MDCTabsScroller, MDCTabsScrollerFoundation} from 'mdc-tabs-scroller';
 ##### CommonJS
 
 ```javascript
-const mdcTab = require('mdc-tab');
+const mdcTab = require('mdc-tabs/tab');
 const MDCTab = mdcTab.MDCTab;
 const MDCTabFoundation = mdcTab.MDCTabFoundation;
 
-const mdcTabs = require('mdc-tabs');
+const mdcTabs = require('mdc-tabs/tabs');
 const MDCTabs = mdcTabs.MDCTabs;
 const MDCTabsFoundation = mdcTabs.MDCTabsFoundation;
 
-const mdcTabsScroller = require('mdc-tabs-scroller');
+const mdcTabsScroller = require('mdc-tabs/tabs-scroller');
 const MDCTabsScroller = mdcTabsScroller.MDCTabsScroller;
 const MDCTabsScrollerFoundation = mdcTab.MDCTabsScrollerFoundation;
 ```
@@ -58,17 +228,17 @@ const MDCTabsScrollerFoundation = mdcTab.MDCTabsScrollerFoundation;
 ##### AMD
 
 ```javascript
-require(['path/to/mdc-tab'], mdcTab => {
+require(['path/to/mdc-tabs/tab'], mdcTab => {
   const MDCTab = mdcTab.MDCTab;
   const MDCTabFoundation = mdcTab.MDCTabFoundation;
 });
 
-require(['path/to/mdc-tabs'], mdcTabs => {
+require(['path/to/mdc-tabs/tabs'], mdcTabs => {
   const MDCTabs = mdcTabs.MDCTabs;
   const MDCTabsFoundation = mdcTabs.MDCTabsFoundation;
 });
 
-require(['path/to/mdc-tabs-scroller'], mdcTabsScroller => {
+require(['path/to/mdc-tabs/tabs-scroller'], mdcTabsScroller => {
   const MDCTabsScroller = mdcTabsScroller.MDCTabsScroller;
   const MDCTabsScrollerFoundation = mdcTabsScroller.MDCTabsScrollerFoundation;
 });
@@ -77,13 +247,13 @@ require(['path/to/mdc-tabs-scroller'], mdcTabsScroller => {
 ##### Global
 
 ```javascript
-const MDCTab = mdc.tab.MDCTab;
+const MDCTab = mdc.tabs.MDCTab;
 const MDCTabFoundation = mdc.tab.MDCTabFoundation;
 
 const MDCTabs = mdc.tabs.MDCTabs;
 const MDCTabsFoundation = mdc.tabs.MDCTabsFoundation;
 
-const MDCTabsScroller = mdc.tabsScroller.MDCTabsScroller;
+const MDCTabsScroller = mdc.tabs.MDCTabsScroller;
 const MDCTabsScrollerFoundation = mdc.tabsScroller.MDCTabsScrollerFoundation;
 ```
 
@@ -98,13 +268,24 @@ mdc.tabs.MDCTabs.attachTo(document.querySelector('#my-mdc-tabs'));
 
 #### Manual Instantiation
 
-Tabs can easily be initialized using their default constructors as well, similar to `attachTo`.
+Tabs can easily be initialized using their default constructors as well, similar to `attachTo`. This process involves a factory to create an instance of MDCTab from each tab Element inside of the `mdc-tabs` node, e.g.:
+
+```html
+<nav id="my-mdc-tabs" class="mdc-tabs">
+  <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+  <a class="mdc-tab" href="#two">Item Two</a>
+  <a class="mdc-tab" href="#three">Three</a>
+  <span class="mdc-tabs__indicator"></span>
+</nav>
+```
 
 ```javascript
 import {MDCTabs} from 'mdc-tabs';
 
 const tabs = new MDCTabs(document.querySelector('#my-mdc-tabs'));
 ```
+
+## Tab Section
 
 ### Tab component API
 
@@ -170,6 +351,8 @@ Sets tabs `preventDefaultOnClick` property to the value of the `preventDefaultOn
 
 Sets `computedWidth_` and `computedLeft_` for a tab.
 
+
+## Tabs Section
 
 ### Tabs component API
 
@@ -238,6 +421,7 @@ Returns the width of the element containing the tabs.
 Updates the active tab to be the tab at the given index, emits `MDCTabs:change` if `shouldNotify` is true.
 
 
+## Tabs Scroller Section
 
 ### Tabs Scroller component API
 
@@ -295,31 +479,3 @@ Calls the adapters `scrollRight()` method and passes RTL context as an argument.
 #### MDCTabsFoundation.scrollLeft(isRTL) => void
 
 Calls the adapters `scrollLeft()` method and passes RTL context as an argument.
-
-
-## Theming
-
-> **NOTE**: Tabs can have multiple theme color combinations. [The demo site](http://material-components-web.appspot.com/tabs.html) demonstrates the multitude of options when deciding on a theme.**
-
-### Dark Theme
-
-#### MDC Tab
-```
-Color: text-secondary-on-dark
-Hover/Press/Active Color: text-primary-on-dark
-Outline color on focus: text-secondary-on-dark
-```
-
-#### MDC Tabs
-```
-Indicator color: text-primary-on-dark
-Ripple color: white
-```
-
-#### MDC Tabs Scroller
-```
-Fwd/Back indicator color: text-secondary-on-dark
-Hover/Pressed indicator color: text-primary-on-dark
-Disabled indicator color: text-disabled-on-dark
-Indicator outline color on focus: text-secondary-on-dark
-```
