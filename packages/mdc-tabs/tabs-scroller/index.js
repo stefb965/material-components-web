@@ -25,19 +25,13 @@ export class MDCTabsScroller extends MDCComponent {
     return new MDCTabsScroller(root);
   }
 
-  get listOfTabNodes() {
-    const tabNodesArray =
-      Array.prototype.slice.call(this.root_.querySelectorAll(MDCTabsScrollerFoundation.strings.TAB_SELECTOR));
-
-    return tabNodesArray;
-  }
-
   initialize() {
     this.isRTL = false;
     this.currentTranslateOffset_ = 0;
     this.computedFrameWidth_ = 0;
     this.scrollFrame = this.root_.querySelector(MDCTabsScrollerFoundation.strings.FRAME_SELECTOR);
     this.tabs = this.root_.querySelector(MDCTabsScrollerFoundation.strings.TABS_SELECTOR);
+    this.iterableTabs = [].slice.call(this.root_.querySelectorAll(MDCTabsScrollerFoundation.strings.TAB_SELECTOR));
     this.shiftBackTarget = this.root_.querySelector(MDCTabsScrollerFoundation.strings.INDICATOR_BACK_SELECTOR);
     this.shiftForwardTarget = this.root_.querySelector(MDCTabsScrollerFoundation.strings.INDICATOR_FORWARD_SELECTOR);
 
@@ -72,7 +66,7 @@ export class MDCTabsScroller extends MDCComponent {
 
     this.isRTL = isRTL;
 
-    for (let i = this.listOfTabNodes.length - 1, tab; tab = this.listOfTabNodes[i]; i--) {
+    for (let i = this.iterableTabs.length - 1, tab; tab = this.iterableTabs[i]; i--) {
       const tabOffsetX = this.isRTL ?
         this.getRTLNormalizedOffsetLeftForTab_(tab) : tab.offsetLeft;
 
@@ -84,14 +78,14 @@ export class MDCTabsScroller extends MDCComponent {
 
       if (tabWidthAccumulator > this.scrollFrame.offsetWidth) {
         scrollTarget = this.isRTL ?
-          this.listOfTabNodes[this.listOfTabNodes.indexOf(tab) + 1] :
-          this.listOfTabNodes[this.listOfTabNodes.indexOf(tab) - 1];
+          this.iterableTabs[this.iterableTabs.indexOf(tab) + 1] :
+          this.iterableTabs[this.iterableTabs.indexOf(tab) - 1];
         break;
       }
     }
 
     if (!scrollTarget) {
-      scrollTarget = this.listOfTabNodes[0];
+      scrollTarget = this.iterableTabs[0];
     }
 
     this.scrollToTab_(scrollTarget);
@@ -103,7 +97,7 @@ export class MDCTabsScroller extends MDCComponent {
 
     this.isRTL = isRTL;
 
-    for (const tab of this.listOfTabNodes) {
+    for (let i = 0, tab; tab = this.iterableTabs[i]; i++) {
       const tabOffsetX = this.isRTL ?
         this.getRTLNormalizedOffsetLeftForTab_(tab) : tab.offsetLeft;
 

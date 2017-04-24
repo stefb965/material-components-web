@@ -48,8 +48,6 @@
 
   // postcss-bem-linter: ignore
   .mdc-toolbar & {
-    margin: 0 auto;
-
     .mdc-tab {
       @include mdc-theme-prop(color, text-secondary-on-primary);
 

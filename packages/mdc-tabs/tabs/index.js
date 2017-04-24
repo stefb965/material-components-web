@@ -95,10 +95,6 @@ export class MDCTabs extends MDCComponent {
     });
   }
 
-  initialSyncWithDOM() {
-    this.syncActiveTab_();
-  }
-
   gatherTabs_(tabFactory) {
     const tabElements = [].slice.call(this.root_.querySelectorAll(strings.TAB_SELECTOR));
     return tabElements.map((el) => tabFactory(el));
@@ -114,14 +110,6 @@ export class MDCTabs extends MDCComponent {
 
   setActiveTabIndex_(activeTabIndex, notifyChange) {
     this.foundation_.switchToTabAtIndex(activeTabIndex, notifyChange);
-  }
-
-  syncActiveTab_() {
-    let activeTabIndex = this.tabs.findIndex((t) => t.isActive);
-    if (activeTabIndex < 0) {
-      activeTabIndex = 0;
-    }
-    this.activeTabIndex = activeTabIndex;
   }
 
   measureSelf_(tab) {
