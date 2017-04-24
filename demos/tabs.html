@@ -21,11 +21,30 @@ limitations under the License
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="assets/material-components-web.css.js" charset="utf-8"></script>
     <style>
+      .mdc-typography {
+        margin: 0;
+      }
+
     	.demo-body {
-    	  padding: 24px;
+    	  padding: 0;
     	  margin: 0;
     	  box-sizing: border-box;
     	}
+
+      h1, h2 {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .demo-note {
+        padding: 20px;
+        margin: 20px;
+        background-color: #f2f2f2;
+      }
+
+      .mdc-toolbar__title {
+        padding-left: 0;
+      }
 
       .demo-content > button {
         margin-bottom: 6px;
@@ -48,12 +67,6 @@ limitations under the License
 
       #dynamic-demo-toolbar h1 {
         margin-left: 64px;
-      }
-
-      #dynamic-demo-toolbar .mdc-tabs {
-        position: absolute;
-        bottom: 0;
-        margin-left: 20px;
       }
 
       section + section {
@@ -97,6 +110,12 @@ limitations under the License
       .dot.active {
         background-color: blue;
         border-color: blue;
+      }
+
+      .my-modified-toolbar-section {
+        position: absolute;
+        right: 0;
+        bottom: 0;
       }
 
     </style>
@@ -272,16 +291,52 @@ limitations under the License
     <section>
       <h2>Within mdc-toolbar</h2>
       <div class="mdc-toolbar">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h1 class="mdc-typography--title">My App</h2>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h1 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav id="toolbar-tabs" class="mdc-tabs">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav id="toolbar-tabs" class="mdc-tabs">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a>
-            <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+      </div>
+    </section>
+
+    <section>
+      <h2>Within mdc-toolbar - fixed to bottom of toolbar</h2>
+      <div class="demo-note">
+        <em>
+          Note: We want to avoid too many modifier classes for layouts like this. Therefore, we recommend overriding the style of
+          <code>mdc-toolbar__section</code> for the <code>MDC-Tabs</code> instance you'd like affixed to the bottom edge of mdc-toolbar. The style used to acheive this example is:
+        </em>
+        <br />
+        <br />
+        <code>
+          .my-modified-toolbar-section {<br />
+          &nbsp;&nbsp;position: absolute;<br />
+          &nbsp;&nbsp;right: 0;<br />
+          &nbsp;&nbsp;bottom: 0;<br />
+          }
+        </code>
+      </div>
+      <div class="mdc-toolbar">
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h1 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section my-modified-toolbar-section">
+            <nav id="toolbar-tabs-modified" class="mdc-tabs">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
@@ -289,33 +344,39 @@ limitations under the License
     <section>
       <h2>Within mdc-toolbar, CSS-Only</h2>
       <div class="mdc-toolbar">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h1 class="mdc-typography--title">My App</h2>
-        </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav class="mdc-tabs">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a>
-            <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h1 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav class="mdc-tabs">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
 
     <section>
       <h2>Within mdc-toolbar + primary indicator</h2>
-      <em>Note: Changing the toolbar's background color here so that the primary indicator can be visible</em>
+      <div class="demo-note">
+        <em>Note: Changing the toolbar's background color here so that the primary indicator can be visible</em>
+      </div>
       <div class="mdc-toolbar mdc-theme--accent-bg">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h1 class="mdc-typography--title">My App</h2>
-        </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav id="toolbar-tabs-primary-indicator" class="mdc-tabs mdc-tabs--indicator-primary">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a> <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h1 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav id="toolbar-tabs-primary-indicator" class="mdc-tabs mdc-tabs--indicator-primary">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a> <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
@@ -323,16 +384,18 @@ limitations under the License
     <section>
       <h2>Within mdc-toolbar + primary indicator, CSS-Only</h2>
       <div class="mdc-toolbar mdc-theme--accent-bg">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h1 class="mdc-typography--title">My App</h2>
-        </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav class="mdc-tabs mdc-tabs--indicator-primary">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a>
-            <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h1 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav class="mdc-tabs mdc-tabs--indicator-primary">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
@@ -340,16 +403,18 @@ limitations under the License
     <section>
       <h2>Within mdc-toolbar + accent indicator</h2>
       <div class="mdc-toolbar">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h2 class="mdc-typography--title">My App</h2>
-        </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav id="toolbar-tabs-accent-indicator" class="mdc-tabs mdc-tabs--indicator-accent">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a>
-            <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h2 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav id="toolbar-tabs-accent-indicator" class="mdc-tabs mdc-tabs--indicator-accent">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
@@ -357,16 +422,18 @@ limitations under the License
     <section>
       <h2>Within mdc-toolbar + accent indicator, CSS-Only</h2>
       <div class="mdc-toolbar">
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
-          <h2 class="mdc-typography--title">My App</h2>
-        </div>
-        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
-          <nav class="mdc-tabs mdc-tabs--indicator-accent">
-            <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
-            <a class="mdc-tab" href="#two">Item Two</a>
-            <a class="mdc-tab" href="#three">Item Three</a>
-            <span class="mdc-tabs__indicator"></span>
-          </nav>
+        <div class="mdc-toolbar__row">
+          <div class="mdc-toolbar__section mdc-toolbar__section--shrink-to-fit mdc-toolbar__section--align-start">
+            <h2 class="mdc-toolbar__title">Title</h2>
+          </div>
+          <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav class="mdc-tabs mdc-tabs--indicator-accent">
+              <a class="mdc-tab mdc-tab--active" href="#one">Item One</a>
+              <a class="mdc-tab" href="#two">Item Two</a>
+              <a class="mdc-tab" href="#three">Item Three</a>
+              <span class="mdc-tabs__indicator"></span>
+            </nav>
+          </div>
         </div>
       </div>
     </section>
@@ -400,8 +467,7 @@ limitations under the License
           <a class="dot" data-trigger="panel-3" href="#panel-3"></a>
         </div>
       </section>
-
-  	</div>
+    </section>
 
     <script src="assets/material-components-web.js" charset="utf-8"></script>
     <script>
@@ -413,6 +479,7 @@ limitations under the License
           window.iconTabs = new mdc.tabs.MDCTabs(document.querySelector('#icon-tabs'));
           window.iconTextTabs = new mdc.tabs.MDCTabs(document.querySelector('#icon-text-tabs'));
           window.toolbarTabs = new mdc.tabs.MDCTabs(document.querySelector('#toolbar-tabs'));
+          window.toolbarTabsModified = new mdc.tabs.MDCTabs(document.querySelector('#toolbar-tabs-modified'));
           window.primaryIndicatorTabs = new mdc.tabs.MDCTabs(document.querySelector('#primary-indicator-tabs'));
           window.accentIndicatorTabs = new mdc.tabs.MDCTabs(document.querySelector('#accent-indicator-tabs'));
           window.primaryIndicatorToolbarTabs = new mdc.tabs.MDCTabs(document.querySelector('#toolbar-tabs-primary-indicator'));
