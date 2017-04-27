@@ -142,11 +142,11 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
     this.adapter_.setFocusedTarget(evt.target);
 
     const focusOffset = this.adapter_.focusedTargetComputedLeft() + this.adapter_.focusedTargetComputedWidth();
-    const translateOffset = this.adapter_.currentTranslateOffset() + this.adapter_.computedScrollFrameWidth();
+    const translateOffset = this.adapter_.currentTranslateOffset();
 
     if (this.adapter_.isRTL()) {
       if (this.adapter_.rtlNormalizedOffsetLeftForFocusedTarget(this.adapter_.focusedTarget()) +
-          this.adapter_.focusedTargetComputedWidth > translateOffset) {
+          this.adapter_.focusedTargetComputedWidth() > translateOffset) {
         this.scrollForward();
       }
 
@@ -159,7 +159,7 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
         this.scrollForward();
       }
 
-      if (this.adapter_.focusedTargetComputedLeft() <= this.currentTranslateOffset_) {
+      if (this.adapter_.focusedTargetComputedLeft() < this.adapter_.currentTranslateOffset()) {
         this.scrollBack();
       }
     }
