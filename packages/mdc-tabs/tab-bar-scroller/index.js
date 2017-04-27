@@ -45,6 +45,14 @@ export class MDCTabBarScroller extends MDCComponent {
     this.scrollTarget_ = tab;
   }
 
+  get currentFocusedTarget() {
+    return this.currentFocusedTarget_;
+  }
+
+  set currentFocusedTarget(target) {
+    this.currentFocusedTarget_ = target;
+  }
+
   initialize() {
     this.scrollTarget_;
     this.currentTranslateOffset_ = 0;
@@ -78,48 +86,53 @@ export class MDCTabBarScroller extends MDCComponent {
         window.addEventListener('resize', handler),
       deregisterWindowResizeHandler: (handler) =>
         window.removeEventListener('resize', handler),
-      checkForNewLayout: (evt) => this.checkForNewLayout_(evt),
       triggerNewLayout: () => requestAnimationFrame(() => this.layout_()),
       numberOfTabs: () => this.iterableTabs.length,
       rtlNormalizedOffsetLeftForTabAtIndex: (index) =>
         this.getRTLNormalizedOffsetLeftForTab_(this.iterableTabs[index]),
+      rtlNormalizedOffsetLeftForFocusedTarget: (target) =>
+        this.getRTLNormalizedOffsetLeftForTab_(target),
       computedWidthForTabAtIndex: (index) => this.iterableTabs[index].offsetWidth,
       computedLeftForTabAtIndex: (index) => this.iterableTabs[index].offsetLeft,
       computedScrollFrameWidth: (index) => this.computedFrameWidth_,
       updateScrollTargetToTabAtIndex: (index) => this.updateScrollTargetWithIndex_(index),
       currentTranslateOffset: () => this.currentTranslateOffset,
       scrollToTab: () => this.scrollToTab_(),
+      setFocusedTarget: (target) => (this.currentFocusedTarget = target),
+      focusedTarget: () => this.currentFocusedTarget,
+      focusedTargetComputedWidth: () => this.currentFocusedTarget.offsetWidth,
+      focusedTargetComputedLeft: () => this.currentFocusedTarget.offsetLeft,
     });
   }
 
-  checkForNewLayout_(evt) {
-    if (!evt.target.classList.contains(MDCTabBarScrollerFoundation.cssClasses.TAB)) {
-      return;
-    }
-
-    const tab = evt.target;
-    const focusOffset = tab.offsetLeft + tab.offsetWidth;
-    const translateOffset = this.currentTranslateOffset_ + this.scrollFrame.offsetWidth;
-
-    if (this.isRTL) {
-      if (this.getRTLNormalizedOffsetLeftForTab_(tab) + tab.offsetWidth > translateOffset) {
-        this.foundation_.scrollForward();
-      }
-
-      if (this.getRTLNormalizedOffsetLeftForTab_(tab) < this.currentTranslateOffset_) {
-        this.foundation_.scrollBack();
-      }
-    }
-    else {
-      if (tab.offsetLeft > translateOffset) {
-        this.foundation_.scrollForward();
-      }
-
-      if (tab.offsetLeft < this.currentTranslateOffset_) {
-        this.foundation_.scrollBack();
-      }
-    }
-  }
+  // checkForNewLayout_(evt) {
+  //   if (!evt.target.classList.contains(MDCTabBarScrollerFoundation.cssClasses.TAB)) {
+  //     return;
+  //   }
+  //
+  //   const tab = evt.target;
+  //   const focusOffset = tab.offsetLeft + tab.offsetWidth;
+  //   const translateOffset = this.currentTranslateOffset_ + this.scrollFrame.offsetWidth;
+  //
+  //   if (this.isRTL) {
+  //     if (this.getRTLNormalizedOffsetLeftForTab_(tab) + tab.offsetWidth > translateOffset) {
+  //       this.foundation_.scrollForward();
+  //     }
+  //
+  //     if (this.getRTLNormalizedOffsetLeftForTab_(tab) < this.currentTranslateOffset_) {
+  //       this.foundation_.scrollBack();
+  //     }
+  //   }
+  //   else {
+  //     if (tab.offsetLeft > translateOffset) {
+  //       this.foundation_.scrollForward();
+  //     }
+  //
+  //     if (tab.offsetLeft < this.currentTranslateOffset_) {
+  //       this.foundation_.scrollBack();
+  //     }
+  //   }
+  // }
 
   layout_() {
     this.computedFrameWidth_ = this.scrollFrame.offsetWidth;
@@ -138,7 +151,7 @@ export class MDCTabBarScroller extends MDCComponent {
   }
 
   scrollToTab_() {
-    this.currentTranslateOffset_ = this.isRTL ?
+    this.currentTranslateOffset = this.isRTL ?
       this.tabs.offsetWidth - (this.scrollTarget.offsetLeft + this.scrollTarget.offsetWidth) :
       this.scrollTarget.offsetLeft;
 
@@ -154,11 +167,9 @@ export class MDCTabBarScroller extends MDCComponent {
   }
 
   shiftFrame_() {
-    console.log(this.scrollFrame.scrollLeft);
-
     const shiftAmount = this.isRTL ?
-      this.currentTranslateOffset_ - this.scrollFrame.scrollLeft :
-      -this.currentTranslateOffset_ + this.scrollFrame.scrollLeft;
+      this.currentTranslateOffset - this.scrollFrame.scrollLeft :
+      -this.currentTranslateOffset + this.scrollFrame.scrollLeft;
 
     this.tabs.style.transform =
       this.tabs.style.webkitTransform = `translateX(${shiftAmount}px)`;
@@ -167,13 +178,13 @@ export class MDCTabBarScroller extends MDCComponent {
   }
 
   updateIndicatorEnabledStates_() {
-    if (this.currentTranslateOffset_ === 0) {
+    if (this.currentTranslateOffset === 0) {
       this.shiftBackTarget.classList.add(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
     } else {
       this.shiftBackTarget.classList.remove(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
     }
 
-    if (this.currentTranslateOffset_ + this.scrollFrame.offsetWidth > this.tabs.offsetWidth) {
+    if (this.currentTranslateOffset + this.scrollFrame.offsetWidth > this.tabs.offsetWidth) {
       this.shiftForwardTarget.classList.add(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
     } else {
       this.shiftForwardTarget.classList.remove(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
