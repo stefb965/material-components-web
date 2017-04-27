@@ -82,15 +82,13 @@ export class MDCTabBarScroller extends MDCComponent {
       triggerNewLayout: () => requestAnimationFrame(() => this.layout_()),
       numberOfTabs: () => this.iterableTabs.length,
       rtlNormalizedOffsetLeftForTabAtIndex: (index) =>
-        getRTLNormalizedOffsetLeftForTab_(this.iterableTabs[index]),
+        this.getRTLNormalizedOffsetLeftForTab_(this.iterableTabs[index]),
       computedWidthForTabAtIndex: (index) => this.iterableTabs[index].offsetWidth,
       computedLeftForTabAtIndex: (index) => this.iterableTabs[index].offsetLeft,
       computedScrollFrameWidth: (index) => this.computedFrameWidth_,
       updateScrollTargetToTabAtIndex: (index) => this.updateScrollTargetWithIndex_(index),
       currentTranslateOffset: () => this.currentTranslateOffset,
       scrollToTab: () => this.scrollToTab_(),
-      scrollBack: () => this.scrollBack(),
-      scrollForward: () => this.scrollForward(),
     });
   }
 
@@ -113,7 +111,7 @@ export class MDCTabBarScroller extends MDCComponent {
       }
     }
     else {
-      if (focusOffset > translateOffset) {
+      if (tab.offsetLeft > translateOffset) {
         this.foundation_.scrollForward();
       }
 
@@ -156,8 +154,11 @@ export class MDCTabBarScroller extends MDCComponent {
   }
 
   shiftFrame_() {
+    console.log(this.scrollFrame.scrollLeft);
+
     const shiftAmount = this.isRTL ?
-      this.currentTranslateOffset_ : -this.currentTranslateOffset_;
+      this.currentTranslateOffset_ - this.scrollFrame.scrollLeft :
+      -this.currentTranslateOffset_ + this.scrollFrame.scrollLeft;
 
     this.tabs.style.transform =
       this.tabs.style.webkitTransform = `translateX(${shiftAmount}px)`;

@@ -49,8 +49,6 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
       updateScrollTargetToTabAtIndex: () => {},
       currentTranslateOffset: () => {},
       scrollToTab: () => {},
-      scrollBack: () => {},
-      scrollForward: () => {},
     };
   }
 
@@ -89,7 +87,6 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
         continue;
       }
 
-      const scrollframedim = this.adapter_.computedScrollFrameWidth();
       tabWidthAccumulator += this.adapter_.computedWidthForTabAtIndex(i);
 
       if (tabWidthAccumulator > this.adapter_.computedScrollFrameWidth()) {
