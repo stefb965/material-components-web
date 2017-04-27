@@ -163,8 +163,13 @@ $mdc-tabs-active-text-color: rgba(black, .87);
   @include mdc-ripple-fg((pseudo: "::after"));
   @include mdc-ripple-bg((pseudo: "::before"));
   @include mdc-theme-dark(".mdc-tab-bar") {
-    @include mdc-ripple-bg((pseudo: "::before", base-color: white, opacity: .16));
-    @include mdc-ripple-fg((pseudo: "::after", base-color: white, opacity: .16));
+    @include mdc-ripple-bg((pseudo: "::before", base-color: map-get($mdc-theme-property-values, text-primary-on-dark), opacity: .16));
+    @include mdc-ripple-fg((pseudo: "::after", base-color: map-get($mdc-theme-property-values, text-primary-on-dark), opacity: .16));
+  }
+
+  .mdc-toolbar & {
+    @include mdc-ripple-bg((pseudo: "::before", base-color: map-get($mdc-theme-property-values, text-primary-on-primary), opacity: .16));
+    @include mdc-ripple-fg((pseudo: "::after", base-color: map-get($mdc-theme-property-values, text-primary-on-primary), opacity: .16));
   }
 
   &:focus {

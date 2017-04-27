@@ -128,15 +128,15 @@ test('adapter#deregisterResizeHandler removes resize listener from component', (
 
 // TODO: sheehana test scrollBack, scrollForward
 if (supportsCssVariables(window)) {
-  test('adapter#scrollBack decreases translateX of tab group', () => {
+  test.only('adapter#scrollBack decreases translateX of tab group', () => {
     const {component, scrollFrame} = setupTest();
     const rtlContext = false;
     const raf = createMockRaf();
-    raf.flush();
 
-    scrollFrame.style.width = 40;
+    scrollFrame.style.width = '40px';
     component.getDefaultFoundation().adapter_.triggerNewLayout();
     raf.flush();
+
     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
     raf.flush();
 

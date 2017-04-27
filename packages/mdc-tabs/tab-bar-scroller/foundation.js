@@ -35,8 +35,11 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
       deregisterBackIndicatorInteractionHandler: (/* handler: EventListener */) => {},
       registerForwardIndicatorInteractionHandler: (/* handler: EventListener */) => {},
       deregisterForwardIndicatorInteractionHandler: (/* handler: EventListener */) => {},
+      registerFocusInteractionHandler: (/* handler: EventListener */) => {},
+      deregisterFocusInteractionHandler: (/* handler: EventListener */) => {},
       registerWindowResizeHandler: (/* handler: EventListener */) => {},
-      deregisterWindowResizeHandler: () => {},
+      deregisterWindowResizeHandler: (/* handler: EventListener */) => {},
+      checkForNewLayout: () => {},
       triggerNewLayout: () => {},
       scrollBack: () => {},
       scrollForward: () => {},
@@ -46,27 +49,33 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCTabBarScrollerFoundation.defaultAdapter, adapter));
 
-    this.forwardIndicatorClickHandler = () => this.scrollForward(this.adapter_.isRTL());
-    this.backIndicatorClickHandler = () => this.scrollBack(this.adapter_.isRTL());
+    this.forwardIndicatorClickHandler = () => this.scrollForward();
+    this.backIndicatorClickHandler = () => this.scrollBack();
   }
 
   init() {
     this.adapter_.registerBackIndicatorInteractionHandler(this.backIndicatorClickHandler);
     this.adapter_.registerForwardIndicatorInteractionHandler(this.forwardIndicatorClickHandler);
     this.adapter_.registerWindowResizeHandler(this.adapter_.triggerNewLayout);
+    this.adapter_.registerFocusInteractionHandler(this.adapter_.checkForNewLayout);
   }
 
   destroy() {
     this.adapter_.deregisterBackIndicatorInteractionHandler(this.backIndicatorClickHandler);
     this.adapter_.deregisterForwardIndicatorInteractionHandler(this.forwardIndicatorClickHandler);
     this.adapter_.deregisterWindowResizeHandler(this.adapter_.triggerNewLayout);
+    this.adapter_.deregisterFocusInteractionHandler(this.focusEventHandler);
   }
 
-  scrollBack(isRTL) {
-    this.adapter_.scrollBack(isRTL);
+  scrollBack() {
+    this.adapter_.scrollBack();
   }
 
-  scrollForward(isRTL) {
-    this.adapter_.scrollForward(isRTL);
+  scrollForward() {
+    this.adapter_.scrollForward();
+  }
+
+  isRTL() {
+    return this.adapter_.isRTL();
   }
 }

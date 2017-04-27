@@ -89,27 +89,27 @@ test('adapter#removeClass removes a class from the root element', () => {
   assert.isNotOk(root.classList.contains('foo'));
 });
 
-test('adapter#bindOnMDCTabSelectedEvent listens for MDCTab:selected on ' +
-     'the component. Makes it active', () => {
-  const {component, fixture} = setupTest();
+test('adapter#bindOnMDCTabSelectedEvent adds event listener for MDCTab:selected on ' +
+     'the component', () => {
+  const {component} = setupTest();
   const raf = createMockRaf();
 
   component.getDefaultFoundation().adapter_.bindOnMDCTabSelectedEvent();
-  domEvents.emit(fixture, 'MDCTab:selected', {tab: component.tabs[0]});
+  component.tabs[1].getDefaultFoundation().adapter_.notifySelected();
+
   raf.flush();
 
-  assert.isTrue(component.tabs[0].root_.classList.contains(cssClasses.ACTIVE));
+  assert.isTrue(component.tabs_[1].root_.classList.contains(cssClasses.ACTIVE));
   raf.restore();
 });
 
-// TODO: sheehana
 test('adapter#unbindOnMDCTabSelectedEvent removes listener from component', () => {
-  const {component, fixture} = setupTest();
+  const {component} = setupTest();
 
   component.getDefaultFoundation().adapter_.unbindOnMDCTabSelectedEvent();
-  domEvents.emit(fixture, 'MDCTab:selected', {tab: component.tabs[0]});
+  component.tabs[1].getDefaultFoundation().adapter_.notifySelected();
 
-  assert.isTrue();
+  assert.isTrue(component.tabs[0].root_.classList.contains(cssClasses.ACTIVE));
 });
 
 test('adapter#registerResizeHandler adds resize listener to the component', () => {

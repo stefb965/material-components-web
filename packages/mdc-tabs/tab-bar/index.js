@@ -105,4 +105,8 @@ export class MDCTabBar extends MDCComponent {
     tab.computedWidth_ = tab.root_.offsetWidth;
     tab.computedLeft_ = tab.root_.offsetLeft;
   }
+
+  layout() {
+    this.foundation_.layout();
+  }
 }

@@ -20,6 +20,7 @@ export const cssClasses = {
   INDICATOR_FORWARD: 'mdc-tab-bar-scroller__indicator--forward',
   INDICATOR_BACK: 'mdc-tab-bar-scroller__indicator--back',
   INDICATOR_DISABLED: 'mdc-tab-bar-scroller__indicator--disabled',
+  TAB: 'mdc-tab',
 };
 
 export const strings = {

@@ -120,6 +120,11 @@ limitations under the License
         bottom: 0;
       }
 
+      [dir="rtl"] .my-modified-toolbar-section {
+        right: auto;
+        left: 0;
+      }
+
     </style>
   </head>
   <body class="mdc-typography">
@@ -318,13 +323,20 @@ limitations under the License
           </em>
           <br />
           <br />
-          <code>
-            .my-modified-toolbar-section {<br />
-            &nbsp;&nbsp;position: absolute;<br />
-            &nbsp;&nbsp;right: 0;<br />
-            &nbsp;&nbsp;bottom: 0;<br />
-            }
+          <pre>
+            <code>
+.my-modified-toolbar-section {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+[dir="rtl"] .my-modified-toolbar-section {
+  right: auto;
+  left: 0;
+}
           </code>
+        </pre>
         </div>
         <div class="mdc-toolbar">
           <div class="mdc-toolbar__row">
@@ -547,17 +559,17 @@ limitations under the License
         (function() {
           document.getElementById('toggle-rtl').addEventListener('click', function(evt) {
             evt.target.parentElement.hasAttribute('dir') ? evt.target.parentElement.removeAttribute('dir') : evt.target.parentElement.setAttribute('dir', 'rtl');
-
-            window.basicTabBar.foundation_.layout()
-            window.scrollableTabBar.foundation_.layout();
-            window.iconTabBar.foundation_.layout();
-            window.iconTextTabBar.foundation_.layout();
-            window.toolbarTabBar.foundation_.layout();
-            window.primaryIndicatorTabBar.foundation_.layout();
-            window.accentIndicatorTabBar.foundation_.layout();
-            window.primaryIndicatorToolbarTabBar.foundation_.layout();
-            window.accentIndicatorToolbarTabBar.foundation_.layout();
-            window.dynamicTabBar.foundation_.layout();
+            window.basicTabBar.layout()
+            window.scrollableTabBar.layout();
+            window.iconTabBar.layout();
+            window.iconTextTabBar.layout();
+            window.toolbarTabBar.layout();
+            window.primaryIndicatorTabBar.layout();
+            window.accentIndicatorTabBar.layout();
+            window.primaryIndicatorToolbarTabBar.layout();
+            window.accentIndicatorToolbarTabBar.layout();
+            window.dynamicTabBar.layout();
+            toolbarTabBarModified.layout();
           });
           document.getElementById('toggle-dark-theme').addEventListener('click', function(evt) {
             document.body.classList.contains('mdc-theme--dark') ? document.body.classList.remove('mdc-theme--dark') : document.body.classList.add('mdc-theme--dark')
