@@ -126,39 +126,39 @@ test('adapter#deregisterResizeHandler removes resize listener from component', (
   td.verify(handler(td.matchers.anything()), {times: 0});
 });
 
-// TODO: sheehana test scrollBack, scrollForward
-if (supportsCssVariables(window)) {
-  test.only('adapter#scrollBack decreases translateX of tab group', () => {
-    const {component, scrollFrame} = setupTest();
-    const rtlContext = false;
-    const raf = createMockRaf();
-
-    scrollFrame.style.width = '40px';
-    component.getDefaultFoundation().adapter_.triggerNewLayout();
-    raf.flush();
-
-    component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
-    raf.flush();
-
-    assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-    raf.restore();
-
-    component.getDefaultFoundation().adapter_.scrollBack(rtlContext);
-    raf.flush();
-
-    assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-    raf.restore();
-  });
-
-  test('adapter#scrollForward increases translateX of tab group', () => {
-    const {component} = setupTest();
-    const rtlContext = false;
-    const raf = createMockRaf();
-
-    component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
-    raf.flush();
-
-    assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-    raf.restore();
-  });
-}
+// // TODO: sheehana test scrollBack, scrollForward
+// if (supportsCssVariables(window)) {
+//   test.only('adapter#scrollBack decreases translateX of tab group', () => {
+//     const {component, scrollFrame} = setupTest();
+//     const rtlContext = false;
+//     const raf = createMockRaf();
+//
+//     scrollFrame.style.width = '40px';
+//     component.getDefaultFoundation().adapter_.triggerNewLayout();
+//     raf.flush();
+//
+//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//
+//     component.getDefaultFoundation().adapter_.scrollBack(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//   });
+//
+//   test('adapter#scrollForward increases translateX of tab group', () => {
+//     const {component} = setupTest();
+//     const rtlContext = false;
+//     const raf = createMockRaf();
+//
+//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//   });
+// }

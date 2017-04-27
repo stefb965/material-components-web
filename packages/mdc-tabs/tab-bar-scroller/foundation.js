@@ -41,6 +41,14 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
       deregisterWindowResizeHandler: (/* handler: EventListener */) => {},
       checkForNewLayout: () => {},
       triggerNewLayout: () => {},
+      numberOfTabs: () => {},
+      rtlNormalizedOffsetLeftForTabAtIndex: () => {},
+      computedWidthForTabAtIndex: () => {},
+      computedLeftForTabAtIndex: () => {},
+      computedScrollFrameWidth: () => {},
+      updateScrollTargetToTabAtIndex: () => {},
+      currentTranslateOffset: () => {},
+      scrollToTab: () => {},
       scrollBack: () => {},
       scrollForward: () => {},
     };
@@ -49,6 +57,7 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCTabBarScrollerFoundation.defaultAdapter, adapter));
 
+    this.currentTranslateOffset_ = 0;
     this.forwardIndicatorClickHandler = () => this.scrollForward();
     this.backIndicatorClickHandler = () => this.scrollBack();
   }
@@ -68,11 +77,59 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
   }
 
   scrollBack() {
-    this.adapter_.scrollBack();
+    let tabWidthAccumulator = 0;
+    let foundScrollTarget = false;
+
+    for (let i = this.adapter_.numberOfTabs() - 1; i > 0; i--) {
+      const tabOffsetX = this.adapter_.isRTL() ?
+        this.adapter_.rtlNormalizedOffsetLeftForTabAtIndex_(i) :
+        this.adapter_.computedLeftForTabAtIndex(i);
+
+      if (tabOffsetX >= this.adapter_.currentTranslateOffset()) {
+        continue;
+      }
+
+      const scrollframedim = this.adapter_.computedScrollFrameWidth();
+      tabWidthAccumulator += this.adapter_.computedWidthForTabAtIndex(i);
+
+      if (tabWidthAccumulator > this.adapter_.computedScrollFrameWidth()) {
+        this.adapter_.updateScrollTargetToTabAtIndex(i + 1);
+        foundScrollTarget = true;
+
+        break;
+      }
+    }
+
+    if (!foundScrollTarget) {
+      this.adapter_.updateScrollTargetToTabAtIndex(0);
+      this.adapter_.scrollToTab();
+    }
+
+    this.adapter_.scrollToTab();
   }
 
   scrollForward() {
-    this.adapter_.scrollForward();
+    const tabsOffset = this.adapter_.computedScrollFrameWidth() + this.adapter_.currentTranslateOffset();
+    let foundScrollTarget = false;
+
+    for (let i = 0; i < this.adapter_.numberOfTabs(); i++) {
+      const tabOffsetX = this.adapter_.isRTL() ?
+        this.adapter_.rtlNormalizedOffsetLeftForTabAtIndex(i) :
+        this.adapter_.computedLeftForTabAtIndex(i);
+
+      if (tabOffsetX + this.adapter_.computedWidthForTabAtIndex(i) >= tabsOffset) {
+        this.adapter_.updateScrollTargetToTabAtIndex(i);
+        foundScrollTarget = true;
+
+        break;
+      }
+    }
+
+    if (!foundScrollTarget) {
+      return;
+    }
+
+    this.adapter_.scrollToTab();
   }
 
   isRTL() {

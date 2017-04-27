@@ -29,7 +29,24 @@ export class MDCTabBarScroller extends MDCComponent {
     return this.foundation_.isRTL();
   }
 
+  get currentTranslateOffset() {
+    return this.currentTranslateOffset_;
+  }
+
+  set currentTranslateOffset(offset) {
+    this.currentTranslateOffset_ = offset;
+  }
+
+  get scrollTarget() {
+    return this.scrollTarget_;
+  }
+
+  set scrollTarget(tab) {
+    this.scrollTarget_ = tab;
+  }
+
   initialize() {
+    this.scrollTarget_;
     this.currentTranslateOffset_ = 0;
     this.computedFrameWidth_ = 0;
     this.scrollFrame = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.FRAME_SELECTOR);
@@ -61,59 +78,20 @@ export class MDCTabBarScroller extends MDCComponent {
         window.addEventListener('resize', handler),
       deregisterWindowResizeHandler: (handler) =>
         window.removeEventListener('resize', handler),
-      checkForNewLayout: (evt) => this.checkForNewLayout_(evt   ),
+      checkForNewLayout: (evt) => this.checkForNewLayout_(evt),
       triggerNewLayout: () => requestAnimationFrame(() => this.layout_()),
+      numberOfTabs: () => this.iterableTabs.length,
+      rtlNormalizedOffsetLeftForTabAtIndex: (index) =>
+        getRTLNormalizedOffsetLeftForTab_(this.iterableTabs[index]),
+      computedWidthForTabAtIndex: (index) => this.iterableTabs[index].offsetWidth,
+      computedLeftForTabAtIndex: (index) => this.iterableTabs[index].offsetLeft,
+      computedScrollFrameWidth: (index) => this.computedFrameWidth_,
+      updateScrollTargetToTabAtIndex: (index) => this.updateScrollTargetWithIndex_(index),
+      currentTranslateOffset: () => this.currentTranslateOffset,
+      scrollToTab: () => this.scrollToTab_(),
       scrollBack: () => this.scrollBack(),
       scrollForward: () => this.scrollForward(),
     });
-  }
-
-  scrollBack() {
-    let scrollTarget;
-    let tabWidthAccumulator = 0;
-
-    for (let i = this.iterableTabs.length - 1, tab; tab = this.iterableTabs[i]; i--) {
-      const tabOffsetX = this.isRTL ?
-        this.getRTLNormalizedOffsetLeftForTab_(tab) : tab.offsetLeft;
-
-      if (tabOffsetX >= this.currentTranslateOffset_) {
-        continue;
-      }
-
-      tabWidthAccumulator += tab.offsetWidth;
-
-      if (tabWidthAccumulator > this.scrollFrame.offsetWidth) {
-        scrollTarget = this.iterableTabs[this.iterableTabs.indexOf(tab) + 1];
-        break;
-      }
-    }
-
-    if (!scrollTarget) {
-      scrollTarget = this.iterableTabs[0];
-    }
-
-    this.scrollToTab_(scrollTarget);
-  }
-
-  scrollForward() {
-    let scrollTarget;
-    const tabsOffset = this.computedFrameWidth_ + this.currentTranslateOffset_;
-
-    for (let i = 0, tab; tab = this.iterableTabs[i]; i++) {
-      const tabOffsetX = this.isRTL ?
-        this.getRTLNormalizedOffsetLeftForTab_(tab) : tab.offsetLeft;
-
-      if (tabOffsetX + tab.offsetWidth >= tabsOffset) {
-        scrollTarget = tab;
-        break;
-      }
-    }
-
-    if (!scrollTarget) {
-      return;
-    }
-
-    this.scrollToTab_(scrollTarget);
   }
 
   checkForNewLayout_(evt) {
@@ -127,20 +105,20 @@ export class MDCTabBarScroller extends MDCComponent {
 
     if (this.isRTL) {
       if (this.getRTLNormalizedOffsetLeftForTab_(tab) + tab.offsetWidth > translateOffset) {
-        this.scrollForward();
+        this.foundation_.scrollForward();
       }
 
       if (this.getRTLNormalizedOffsetLeftForTab_(tab) < this.currentTranslateOffset_) {
-        this.scrollBack();
+        this.foundation_.scrollBack();
       }
     }
     else {
       if (focusOffset > translateOffset) {
-        this.scrollForward();
+        this.foundation_.scrollForward();
       }
 
       if (tab.offsetLeft < this.currentTranslateOffset_) {
-        this.scrollBack();
+        this.foundation_.scrollBack();
       }
     }
   }
@@ -161,15 +139,20 @@ export class MDCTabBarScroller extends MDCComponent {
     this.updateIndicatorEnabledStates_();
   }
 
-  scrollToTab_(tab) {
+  scrollToTab_() {
     this.currentTranslateOffset_ = this.isRTL ?
-      this.tabs.offsetWidth - (tab.offsetLeft + tab.offsetWidth) :
-      tab.offsetLeft;
+      this.tabs.offsetWidth - (this.scrollTarget.offsetLeft + this.scrollTarget.offsetWidth) :
+      this.scrollTarget.offsetLeft;
+
     requestAnimationFrame(() => this.shiftFrame_());
   }
 
   getRTLNormalizedOffsetLeftForTab_(tab) {
     return this.tabs.offsetWidth - (tab.offsetLeft + tab.offsetWidth);
+  }
+
+  updateScrollTargetWithIndex_(index) {
+    this.scrollTarget = this.iterableTabs[index];
   }
 
   shiftFrame_() {
