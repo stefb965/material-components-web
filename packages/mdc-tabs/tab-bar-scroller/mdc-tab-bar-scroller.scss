@@ -48,12 +48,20 @@
     justify-content: center;
     width: $mdc-tab-bar-scroller-indicator-width;
 
-    @include mdc-theme-prop(background-color, text-primary-on-dark);
+    @include mdc-theme-prop(color, text-secondary-on-light);
 
     @include mdc-theme-dark(".mdc-tab-bar") {
-      background-color: transparent;
+      @include mdc-theme-prop(color, text-secondary-on-dark);
+    }
 
-      @include mdc-theme-prop(color, text-primary-on-dark);
+    cursor: pointer;
+
+    &:hover {
+      @include mdc-theme-prop(color, text-primary-on-light);
+
+      @include mdc-theme-dark(".mdc-tab-bar") {
+        @include mdc-theme-prop(color, text-primary-on-dark);
+      }
     }
 
     &__inner {
@@ -80,8 +88,7 @@
   }
 
   &__indicator--disabled {
-    opacity: 0;
-    pointer-events: none;
+    visibility: hidden;
   }
 }
 

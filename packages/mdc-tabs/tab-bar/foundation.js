@@ -77,17 +77,6 @@ export default class MDCTabBarFoundation extends MDCFoundation {
     this.adapter_.deregisterResizeHandler(this.resizeHandler_);
   }
 
-  layout() {
-    if (this.layoutFrame_) {
-      cancelAnimationFrame(this.layoutFrame_);
-    }
-
-    this.layoutFrame_ = requestAnimationFrame(() => {
-      this.layoutInternal_();
-      this.layoutFrame_ = 0;
-    });
-  }
-
   layoutInternal_() {
     this.forEachTabIndex_((index) => this.adapter_.measureTabAtIndex(index));
     this.computedWidth_ = this.adapter_.getOffsetWidth();
@@ -107,6 +96,7 @@ export default class MDCTabBarFoundation extends MDCFoundation {
       this.adapter_.getComputedWidthForTabAtIndex(this.activeTabIndex_) / this.adapter_.getOffsetWidth();
 
     const transformValue = `translateX(${translateAmtForActiveTabLeft}px) scale(${scaleAmtForActiveTabWidth}, 1)`;
+
     ['-webkit-transform', 'transform'].forEach((transformProperty) => {
       this.adapter_.setStyleForIndicator(transformProperty, transformValue);
     });
@@ -121,22 +111,26 @@ export default class MDCTabBarFoundation extends MDCFoundation {
     }
   }
 
+  layout() {
+    if (this.layoutFrame_) {
+      cancelAnimationFrame(this.layoutFrame_);
+    }
+
+    this.layoutFrame_ = requestAnimationFrame(() => {
+      this.layoutInternal_();
+      this.layoutFrame_ = 0;
+    });
+  }
+
   getActiveTabIndex() {
     return this.activeTabIndex_;
-  }
-
-  getComputedWidth() {
-    return this.computedWidth_;
-  }
-
-  getComputedLeft() {
-    return this.computedLeft_;
   }
 
   switchToTabAtIndex(index, shouldNotify) {
     if (index === this.activeTabIndex_) {
       return;
     }
+
     if (index < 0 || index >= this.adapter_.getNumberOfTabs()) {
       throw new Error(`Out of bounds index specified for tab: ${index}`);
     }
@@ -147,7 +141,7 @@ export default class MDCTabBarFoundation extends MDCFoundation {
       if (prevActiveTabIndex >= 0) {
         this.adapter_.setTabActiveAtIndex(prevActiveTabIndex, false);
       }
-      this.adapter_.setTabActiveAtIndex(this.activeTabIndex_, false);
+      this.adapter_.setTabActiveAtIndex(this.activeTabIndex_, true);
       this.layoutIndicator_();
       if (shouldNotify) {
         this.adapter_.notifyChange({activeTabIndex: this.activeTabIndex_});

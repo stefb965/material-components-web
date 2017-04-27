@@ -18,8 +18,10 @@ import {assert} from 'chai';
 import bel from 'bel';
 import domEvents from 'dom-events';
 import td from 'testdouble';
+import {createMockRaf} from '../helpers/raf';
 import {MDCTab} from '../../../packages/mdc-tabs/tab';
 import {MDCTabBar} from '../../../packages/mdc-tabs/tab-bar';
+import {cssClasses} from '../../../packages/mdc-tabs/tab/constants';
 
 function getFixture() {
   return bel`
@@ -70,24 +72,11 @@ test('#set activeTabIndex', () => {
 
   component.activeTabIndex = 1;
   assert.equal(component.activeTabIndex, 1);
-  component.activeTabIndex = 2;
-  assert.equal(component.activeTabIndex, 2);
-});
-
-test('#get computedWidth returns computed width', () => {
-  const {component} = setupTest();
-
-  assert.equal(component.computedWidth, 0);
-});
-
-test('#get computedLeft returns computed left offset', () => {
-  const {component} = setupTest();
-
-  assert.equal(component.computedLeft, 0);
 });
 
 test('adapter#addClass adds a class to the root element', () => {
   const {root, component} = setupTest();
+
   component.getDefaultFoundation().adapter_.addClass('foo');
   assert.isOk(root.classList.contains('foo'));
 });
@@ -95,20 +84,32 @@ test('adapter#addClass adds a class to the root element', () => {
 test('adapter#removeClass removes a class from the root element', () => {
   const {root, component} = setupTest();
   root.classList.add('foo');
+
   component.getDefaultFoundation().adapter_.removeClass('foo');
   assert.isNotOk(root.classList.contains('foo'));
 });
 
 test('adapter#bindOnMDCTabSelectedEvent listens for MDCTab:selected on ' +
-     'the component', () => {
+     'the component. Makes it active', () => {
   const {component, fixture} = setupTest();
+  const raf = createMockRaf();
 
   component.getDefaultFoundation().adapter_.bindOnMDCTabSelectedEvent();
-  domEvents.emit(fixture, 'MDCTab:selected');
+  domEvents.emit(fixture, 'MDCTab:selected', {tab: component.tabs[0]});
+  raf.flush();
+
+  assert.isTrue(component.tabs[0].root_.classList.contains(cssClasses.ACTIVE));
+  raf.restore();
 });
 
+// TODO: sheehana
 test('adapter#unbindOnMDCTabSelectedEvent removes listener from component', () => {
+  const {component, fixture} = setupTest();
 
+  component.getDefaultFoundation().adapter_.unbindOnMDCTabSelectedEvent();
+  domEvents.emit(fixture, 'MDCTab:selected', {tab: component.tabs[0]});
+
+  assert.isTrue();
 });
 
 test('adapter#registerResizeHandler adds resize listener to the component', () => {
@@ -119,17 +120,18 @@ test('adapter#registerResizeHandler adds resize listener to the component', () =
   domEvents.emit(window, 'resize');
 
   td.verify(handler(td.matchers.anything()));
+  window.removeEventListener('resize', handler);
 });
 
 test('adapter#deregisterResizeHandler removes resize listener from component', () => {
   const {component} = setupTest();
   const handler = td.func('resizeHandler');
 
-  window.addEventListener('resize', handler);
   component.getDefaultFoundation().adapter_.deregisterResizeHandler(handler);
   domEvents.emit(window, 'resize');
 
   td.verify(handler(td.matchers.anything()), {times: 0});
+  window.removeEventListener('resize', handler);
 });
 
 test('adapter#getOffsetWidth returns width of component', () => {
@@ -158,12 +160,15 @@ test('adapter#getOffsetWidthForIndicator returns the width of the active tab ind
 test('adapter#notifyChange emits MDCTabBar:change with event data', () => {
   const {component} = setupTest();
 
-  const handler = td.func('changeHandler');
+  const data = td.func('eventDataObj');
+  const handler = (d) => {
+    assert.equal(data, d);
+  };
 
-  component.listen('MDCTabBar:change', handler);
-  component.getDefaultFoundation().adapter_.notifyChange({});
-
-  td.verify(handler(td.matchers.anything()));
+  window.addEventListener('MDCTabBar:change', () => {
+    handler(data);
+  });
+  component.getDefaultFoundation().adapter_.notifyChange(data);
 });
 
 test('adapter#getNumberOfTabs returns the number of tabs', () => {
@@ -196,7 +201,7 @@ test('adapter#setTabActiveAtIndex sets tab at target index to true or false', ()
   assert.isTrue(component.tabs[targetIndex].foundation_.isActive());
 });
 
-test('adapter#isDefault PreventedOnClickForTabAtIndex returns the value ' +
+test('adapter#isDefaultPreventedOnClickForTabAtIndex returns the value ' +
   ' of preventsDefaultOnClick', () => {
   const {component} = setupTest();
   const targetIndex = 0;

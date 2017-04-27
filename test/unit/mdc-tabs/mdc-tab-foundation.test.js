@@ -45,6 +45,7 @@ test('#init registers tab interaction handlers', () => {
   const {isA} = td.matchers;
 
   foundation.init();
+
   td.verify(mockAdapter.registerInteractionHandler('click', isA(Function)));
   td.verify(mockAdapter.registerInteractionHandler('keydown', isA(Function)));
 });
@@ -54,8 +55,37 @@ test('#destroy deregisters tab interaction handlers', () => {
   const {isA} = td.matchers;
 
   foundation.destroy();
+
   td.verify(mockAdapter.deregisterInteractionHandler('click', isA(Function)));
   td.verify(mockAdapter.deregisterInteractionHandler('keydown', isA(Function)));
+});
+
+test('#getComputedWidth returns the width of the tab', () => {
+  const {foundation, mockAdapter} = setupTest();
+
+  td.when(mockAdapter.getOffsetWidth()).thenReturn(200);
+
+  foundation.measureSelf();
+  assert.equal(foundation.getComputedWidth(), 200);
+});
+
+test('#getComputedLeft returns the left offset of the tab', () => {
+  const {foundation, mockAdapter} = setupTest();
+
+  td.when(mockAdapter.getOffsetLeft()).thenReturn(10);
+
+  foundation.measureSelf();
+  assert.equal(foundation.getComputedLeft(), 10);
+});
+
+test('#isActive returns active state of the tab', () => {
+  const {foundation} = setupTest();
+
+  foundation.setActive(false);
+  assert.isFalse(foundation.isActive());
+
+  foundation.setActive(true);
+  assert.isTrue(foundation.isActive());
 });
 
 test('#setActive adds active class when isActive is true', () => {
@@ -72,8 +102,18 @@ test('#setActive removes active class when isActive is false', () => {
   td.verify(mockAdapter.removeClass(cssClasses.ACTIVE));
 });
 
+test('#preventsDefaultOnClick returns state of preventsDefaultOnClick', () => {
+  const {foundation} = setupTest();
+
+  foundation.setPreventDefaultOnClick(false);
+  assert.isFalse(foundation.preventsDefaultOnClick());
+
+  foundation.setPreventDefaultOnClick(true);
+  assert.isTrue(foundation.preventsDefaultOnClick());
+});
+
 test('#setPreventDefaultOnClick sets preventDefaultOnClick_' +
- 'to true the value of preventDefaultOnClick param', () => {
+ 'to the value of preventDefaultOnClick argument', () => {
    const {foundation} = setupTest();
 
    foundation.setPreventDefaultOnClick(false);

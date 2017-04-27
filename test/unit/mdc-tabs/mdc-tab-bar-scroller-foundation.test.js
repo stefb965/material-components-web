@@ -68,3 +68,23 @@ test('#destroy deregisters interaction and resize handlers', () => {
   td.verify(mockAdapter.deregisterForwardIndicatorInteractionHandler(isA(Function)));
   td.verify(mockAdapter.deregisterWindowResizeHandler(isA(Function)));
 });
+
+test('#scrollBack calls scroll back', () => {
+  const {foundation, mockAdapter} = setupTest();
+  const {isA} = td.matchers;
+  const rtlContext = false;
+
+  foundation.scrollBack(rtlContext);
+
+  td.verify(mockAdapter.scrollBack(isA(Boolean)));
+});
+
+test('#scrollForward calls scroll forward', () => {
+  const {foundation, mockAdapter} = setupTest();
+  const {isA} = td.matchers;
+  const rtlContext = false;
+
+  foundation.scrollForward(rtlContext);
+
+  td.verify(mockAdapter.scrollForward(isA(Boolean)));
+});

@@ -32,10 +32,6 @@ export class MDCTabBar extends MDCComponent {
   }
 
   get activeTab() {
-    if (this.activeTabIndex < 0) {
-      return null;
-    }
-
     return this.tabs[this.activeTabIndex];
   }
 
@@ -51,14 +47,6 @@ export class MDCTabBar extends MDCComponent {
     this.setActiveTabIndex_(activeTabIndex, false);
   }
 
-  get computedWidth() {
-    return this.foundation_.getComputedWidth();
-  }
-
-  get computedLeft() {
-    return this.foundation_.getComputedLeft();
-  }
-
   initialize(tabFactory = (el) => new MDCTab(el)) {
     this.indicator_ = this.root_.querySelector(strings.INDICATOR_SELECTOR);
     this.tabs_ = this.gatherTabs_(tabFactory);
@@ -72,7 +60,8 @@ export class MDCTabBar extends MDCComponent {
     return new MDCTabBarFoundation({
       addClass: (className) => this.root_.classList.add(className),
       removeClass: (className) => this.root_.classList.remove(className),
-      bindOnMDCTabSelectedEvent: () => this.root_.addEventListener('MDCTab:selected', this.tabSelectedHandler_, true),
+      bindOnMDCTabSelectedEvent: () =>
+        this.root_.addEventListener('MDCTab:selected', this.tabSelectedHandler_, true),
       unbindOnMDCTabSelectedEvent: () =>
         this.root_.removeEventListener('MDCTab:selected', this.tabSelectedHandler_, true),
       registerResizeHandler: (handler) => window.addEventListener('resize', handler),

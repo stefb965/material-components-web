@@ -78,17 +78,8 @@ test('attachTo returns a component instance', () => {
   assert.isTrue(MDCTabBarScroller.attachTo(root) instanceof MDCTabBarScroller);
 });
 
-test('#get iterableTabs returns list of tabs', () => {
-  const {component} = setupTest();
-
-  assert.isArray(component.iterableTabs);
-
-  for (const tab of component.iterableTabs) {
-    assert.instanceOf(tab, HTMLElement);
-  }
-});
-
-test('adapter#isRTL returns true if in RTL context', () => {
+// TODO: sheehana add for rtl context
+test('adapter#isRTL returns false if not in RTL context', () => {
   const {component} = setupTest();
 
   assert.isFalse(component.getDefaultFoundation().adapter_.isRTL());
@@ -135,14 +126,23 @@ test('adapter#deregisterResizeHandler removes resize listener from component', (
   td.verify(handler(td.matchers.anything()), {times: 0});
 });
 
+// TODO: sheehana test scrollBack, scrollForward
 if (supportsCssVariables(window)) {
   test('adapter#scrollBack decreases translateX of tab group', () => {
-    const {component} = setupTest();
+    const {component, scrollFrame} = setupTest();
     const rtlContext = false;
     const raf = createMockRaf();
     raf.flush();
 
-    component.tabs.style.transform = component.tabs.style.webkitTransform = 'translateX(50px)';
+    scrollFrame.style.width = 40;
+    component.getDefaultFoundation().adapter_.triggerNewLayout();
+    raf.flush();
+    component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
+    raf.flush();
+
+    assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+    raf.restore();
+
     component.getDefaultFoundation().adapter_.scrollBack(rtlContext);
     raf.flush();
 
@@ -154,8 +154,6 @@ if (supportsCssVariables(window)) {
     const {component} = setupTest();
     const rtlContext = false;
     const raf = createMockRaf();
-
-    raf.flush();
 
     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
     raf.flush();

@@ -18,6 +18,7 @@ import td from 'testdouble';
 
 import {setupFoundationTest} from '../helpers/setup';
 import {verifyDefaultAdapter} from '../helpers/foundation';
+import {createMockRaf} from '../helpers/raf';
 
 import MDCTabBarFoundation from '../../../packages/mdc-tabs/tab-bar/foundation';
 
@@ -64,6 +65,28 @@ test('#init registers listeners', () => {
   td.verify(mockAdapter.registerResizeHandler(isA(Function)));
 });
 
+test('#init assigns active tab', () => {
+  const {foundation, mockAdapter} = setupTest();
+  const mockTab = td.object({isActive: true});
+
+  td.when(mockAdapter.getActiveTab()).thenReturn(mockTab);
+
+  foundation.init();
+  assert.equal(foundation.activeTab_, mockTab);
+});
+
+test('#init sets -webkit-transform and transform for indicator', () => {
+  const {foundation, mockAdapter} = setupTest();
+  const raf = createMockRaf();
+
+  foundation.init();
+  raf.flush();
+
+  td.verify(mockAdapter.setStyleForIndicator(td.matchers.anything(), td.matchers.anything()));
+
+  raf.restore();
+});
+
 test('#destroy removes class from tabs', () => {
   const {foundation, mockAdapter, UPGRADED} = setupTest();
 
@@ -78,4 +101,53 @@ test('#destroy deregisters tab event handlers', () => {
   foundation.destroy();
   td.verify(mockAdapter.unbindOnMDCTabSelectedEvent());
   td.verify(mockAdapter.deregisterResizeHandler(isA(Function)));
+});
+
+test('#getActiveTabIndex returns the index of the active tab', () => {
+  const {foundation, mockAdapter} = setupTest();
+
+  td.when(mockAdapter.getActiveTab()).thenReturn(0);
+
+  assert.equal(foundation.getActiveTabIndex(), 0);
+});
+
+test('#switchToTabAtIndex does nothing if the currently active tab is clicked', () => {
+  const {foundation, mockAdapter} = setupTest();
+
+  foundation.switchToTabAtIndex(0, true);
+
+  td.verify(mockAdapter.setTabActiveAtIndex(
+      td.matchers.anything(), td.matchers.isA(Boolean)
+    ), {times: 0});
+  td.verify(mockAdapter.notifyChange(td.matchers.anything()), {times: 0});
+});
+
+test('#switchToTabAtIndex throws if index negative', () => {
+  const {foundation} = setupTest();
+
+  assert.throws(() => foundation.switchToTabAtIndex(-1, true));
+});
+
+test('#switchToTabAtIndex throws if index is out of bounds', () => {
+  const {foundation, mockAdapter} = setupTest();
+
+  td.when(mockAdapter.getNumberOfTabs()).thenReturn(2);
+
+  assert.throws(() => foundation.switchToTabAtIndex(2, true));
+});
+
+test('#switchToTabAtIndex makes tab active', () => {
+  const {foundation, mockAdapter} = setupTest();
+  const raf = createMockRaf();
+  const tabToSwitchTo = 1;
+  const shouldNotify = true;
+
+  td.when(mockAdapter.getNumberOfTabs()).thenReturn(2);
+
+  foundation.switchToTabAtIndex(tabToSwitchTo, shouldNotify);
+  raf.flush();
+
+  td.verify(mockAdapter.setTabActiveAtIndex(tabToSwitchTo, shouldNotify));
+  td.verify(mockAdapter.notifyChange(td.matchers.anything()));
+  raf.restore();
 });

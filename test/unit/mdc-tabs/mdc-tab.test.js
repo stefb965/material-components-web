@@ -21,6 +21,7 @@ import td from 'testdouble';
 import {createMockRaf} from '../helpers/raf';
 import {supportsCssVariables} from '../../../packages/mdc-ripple/util';
 import {MDCTab} from '../../../packages/mdc-tabs/tab';
+import {cssClasses} from '../../../packages/mdc-tabs/tab/constants';
 
 function getFixture() {
   return bel`
@@ -57,45 +58,52 @@ if (supportsCssVariables(window)) {
   });
 }
 
-test('#get computedWidth returns computed width', () => {
-  const {component} = setupTest();
+test('#get computedWidth returns computed width of tab', () => {
+  const {root, component} = setupTest();
 
-  assert.equal(component.computedWidth, 0);
+  assert.equal(component.computedWidth, root.offsetWidth);
 });
 
-test('#get computedLeft returns computed left offset', () => {
-  const {component} = setupTest();
+test('#get computedLeft returns computed left offset of tab', () => {
+  const {root, component} = setupTest();
 
-  assert.equal(component.computedLeft, 0);
+  assert.equal(component.computedLeft, root.offsetLeft);
 });
 
 test('#get/set isActive', () => {
   const {component} = setupTest();
 
-  assert.isFalse(component.isActive);
+  component.isActive = false;
+  assert.isFalse(component.root_.classList.contains(cssClasses.ACTIVE));
+
   component.isActive = true;
-  assert.isTrue(component.isActive);
+  assert.isTrue(component.root_.classList.contains(cssClasses.ACTIVE));
 });
 
 test('#get/set preventDefaultOnClick', () => {
   const {component} = setupTest();
 
+  component.preventDefaultOnClick = false;
   assert.isFalse(component.preventDefaultOnClick);
+
   component.preventDefaultOnClick = true;
   assert.isTrue(component.preventDefaultOnClick);
 });
 
 test('adapter#addClass adds a class to the root element', () => {
   const {root, component} = setupTest();
+
   component.getDefaultFoundation().adapter_.addClass('foo');
-  assert.isOk(root.classList.contains('foo'));
+  assert.isTrue(root.classList.contains('foo'));
 });
 
 test('adapter#removeClass removes a class from the root element', () => {
   const {root, component} = setupTest();
+
   root.classList.add('foo');
+  assert.isTrue(root.classList.contains('foo'));
   component.getDefaultFoundation().adapter_.removeClass('foo');
-  assert.isNotOk(root.classList.contains('foo'));
+  assert.isFalse(root.classList.contains('foo'));
 });
 
 test('adapter#registerInteractionHandler adds an event listener to the root element', () => {
@@ -111,6 +119,7 @@ test('adapter#registerInteractionHandler adds an event listener to the root elem
 test('adapter#deregisterInteractionHandler removes an event listener from the root element', () => {
   const {root, component} = setupTest();
   const handler = td.func('eventHandler');
+
   root.addEventListener('click', handler);
 
   component.getDefaultFoundation().adapter_.deregisterInteractionHandler('click', handler);
@@ -120,16 +129,16 @@ test('adapter#deregisterInteractionHandler removes an event listener from the ro
 });
 
 test('adapter#getOffsetWidth returns the width of the tab', () => {
-  const {component} = setupTest();
+  const {root, component} = setupTest();
 
-  assert.equal(component.getDefaultFoundation().adapter_.getOffsetWidth(), 0);
+  assert.equal(component.getDefaultFoundation().adapter_.getOffsetWidth(), root.offsetWidth);
 });
 
 test('adapter#getOffsetLeft returns the distance that '+
   'the left edge of the tab is from the left edge of the frame', () => {
-  const {component} = setupTest();
+  const {root, component} = setupTest();
 
-  assert.equal(component.getDefaultFoundation().adapter_.getOffsetLeft(), 0);
+  assert.equal(component.getDefaultFoundation().adapter_.getOffsetLeft(), root.offsetLeft);
 });
 
 test('adapter#notifySelected emits MDCTab:selected', () => {
