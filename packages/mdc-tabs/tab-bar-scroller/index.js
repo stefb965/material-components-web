@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import {getCorrectPropertyName} from '@material/animation';
 import MDCComponent from '@material/base/component';
 
+import {MDCTabBar} from '../tab-bar';
 import MDCTabBarScrollerFoundation from './foundation';
 
 export {MDCTabBarScrollerFoundation};
@@ -25,139 +27,56 @@ export class MDCTabBarScroller extends MDCComponent {
     return new MDCTabBarScroller(root);
   }
 
-  get isRTL() {
-    return this.foundation_.isRTL();
+  get tabBar() {
+    return this.tabBar_;
   }
 
-  get currentTranslateOffset() {
-    return this.currentTranslateOffset_;
-  }
-
-  set currentTranslateOffset(offset) {
-    this.currentTranslateOffset_ = offset;
-  }
-
-  get scrollTarget() {
-    return this.scrollTarget_;
-  }
-
-  set scrollTarget(tab) {
-    this.scrollTarget_ = tab;
-  }
-
-  get currentFocusedTarget() {
-    return this.currentFocusedTarget_;
-  }
-
-  set currentFocusedTarget(target) {
-    this.currentFocusedTarget_ = target;
-  }
-
-  initialize() {
-    this.scrollTarget_;
-    this.currentTranslateOffset_ = 0;
-    this.computedFrameWidth_ = 0;
-    this.scrollFrame = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.FRAME_SELECTOR);
-    this.tabs = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.TABS_SELECTOR);
-    this.iterableTabs = [].slice.call(this.root_.querySelectorAll(MDCTabBarScrollerFoundation.strings.TAB_SELECTOR));
-    this.shiftBackTarget = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.INDICATOR_BACK_SELECTOR);
-    this.shiftForwardTarget = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.INDICATOR_FORWARD_SELECTOR);
-
-    requestAnimationFrame(() => this.layout_());
+  initialize(tabBarFactory = (root) => new MDCTabBar(root)) {
+    this.scrollFrame_ = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.FRAME_SELECTOR);
+    this.tabBarEl_ = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.TABS_SELECTOR);
+    this.forwardIndicator_ = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.INDICATOR_FORWARD_SELECTOR);
+    this.backIndicator_ = this.root_.querySelector(MDCTabBarScrollerFoundation.strings.INDICATOR_BACK_SELECTOR);
+    this.tabBar_ = tabBarFactory(this.tabBarEl_);
   }
 
   getDefaultFoundation() {
     return new MDCTabBarScrollerFoundation({
+      addClass: (className) => this.root_.classList.add(className),
+      removeClass: (className) => this.root_.classList.remove(className),
+      eventTargetHasClass: (target, className) => target.classList.contains(className),
+      addClassToForwardIndicator: (className) => this.forwardIndicator_.classList.add(className),
+      removeClassFromForwardIndicator: (className) => this.forwardIndicator_.classList.remove(className),
+      addClassToBackIndicator: (className) => this.backIndicator_.classList.add(className),
+      removeClassFromBackIndicator: (className) => this.backIndicator_.classList.remove(className),
       isRTL: () =>
         getComputedStyle(this.root_).getPropertyValue('direction') === 'rtl',
-      registerBackIndicatorInteractionHandler: (handler) =>
-        this.shiftBackTarget.addEventListener('click', handler),
-      deregisterBackIndicatorInteractionHandler: (handler) =>
-        this.shiftBackTarget.removeEventListener('click', handler),
-      registerForwardIndicatorInteractionHandler: (handler) =>
-        this.shiftForwardTarget.addEventListener('click', handler),
-      deregisterForwardIndicatorInteractionHandler: (handler) =>
-        this.shiftForwardTarget.removeEventListener('click', handler),
-      registerFocusInteractionHandler: (handler) =>
+      registerBackIndicatorClickHandler: (handler) =>
+        this.backIndicator_.addEventListener('click', handler),
+      deregisterBackIndicatorClickHandler: (handler) =>
+        this.backIndicator_.removeEventListener('click', handler),
+      registerForwardIndicatorClickHandler: (handler) =>
+        this.forwardIndicator_.addEventListener('click', handler),
+      deregisterForwardIndicatorClickHandler: (handler) =>
+        this.forwardIndicator_.removeEventListener('click', handler),
+      registerCapturedFocusHandler: (handler) =>
         this.root_.addEventListener('focus', handler, true),
-      deregisterFocusInteractionHandler: (handler) =>
+      deregisterCapturedFocusHandler: (handler) =>
         this.root_.removeEventListener('focus', handler, true),
       registerWindowResizeHandler: (handler) =>
         window.addEventListener('resize', handler),
       deregisterWindowResizeHandler: (handler) =>
         window.removeEventListener('resize', handler),
-      triggerNewLayout: () => requestAnimationFrame(() => this.layout_()),
-      numberOfTabs: () => this.iterableTabs.length,
-      rtlNormalizedOffsetLeftForTabAtIndex: (index) =>
-        this.getRTLNormalizedOffsetLeftForTab_(this.iterableTabs[index]),
-      rtlNormalizedOffsetLeftForFocusedTarget: (target) =>
-        this.getRTLNormalizedOffsetLeftForTab_(target),
-      computedWidthForTabAtIndex: (index) => this.iterableTabs[index].offsetWidth,
-      computedLeftForTabAtIndex: (index) => this.iterableTabs[index].offsetLeft,
-      computedScrollFrameWidth: () => this.computedFrameWidth_,
-      updateScrollTargetToTabAtIndex: (index) => this.setScrollTargetWithIndex_(index),
-      currentTranslateOffset: () => this.currentTranslateOffset,
-      scrollToTab: () => this.scrollToTab_(),
-      setFocusedTarget: (target) => (this.currentFocusedTarget = target),
-      focusedTarget: () => this.currentFocusedTarget,
-      focusedTargetComputedWidth: () => this.currentFocusedTarget.offsetWidth,
-      focusedTargetComputedLeft: () => this.currentFocusedTarget.offsetLeft,
+      getNumberOfTabs: () => this.tabBar.tabs.length,
+      getComputedWidthForTabAtIndex: (index) => this.tabBar.tabs[index].computedWidth,
+      getComputedLeftForTabAtIndex: (index) => this.tabBar.tabs[index].computedLeft,
+      getOffsetWidthForScrollFrame: () => this.scrollFrame_.offsetWidth,
+      getScrollLeftForScrollFrame: () => this.scrollFrame_.scrollLeft,
+      getOffsetWidthForTabBar: () => this.tabBarEl_.offsetWidth,
+      setTransformStyleForTabBar: (value) => {
+        this.tabBarEl_.style.setProperty(getCorrectPropertyName(window, 'transform'), value);
+      },
+      getOffsetLeftForEventTarget: (target) => target.offsetLeft,
+      getOffsetWidthForEventTarget: (target) => target.offsetWidth,
     });
-  }
-
-  layout_() {
-    this.computedFrameWidth_ = this.scrollFrame.offsetWidth;
-    const isOverflowing = this.tabs.offsetWidth > this.computedFrameWidth_;
-
-    if (isOverflowing) {
-      this.tabs.classList.add(MDCTabBarScrollerFoundation.cssClasses.VISIBLE);
-    } else {
-      this.tabs.classList.remove(MDCTabBarScrollerFoundation.cssClasses.VISIBLE);
-      this.currentTranslateOffset_ = 0;
-      this.shiftFrame_();
-    }
-
-    this.updateIndicatorEnabledStates_();
-  }
-
-  scrollToTab_() {
-    this.currentTranslateOffset = this.isRTL ?
-      this.tabs.offsetWidth - (this.scrollTarget.offsetLeft + this.scrollTarget.offsetWidth) :
-      this.scrollTarget.offsetLeft;
-
-    requestAnimationFrame(() => this.shiftFrame_());
-  }
-
-  getRTLNormalizedOffsetLeftForTab_(tab) {
-    return this.tabs.offsetWidth - (tab.offsetLeft + tab.offsetWidth);
-  }
-
-  setScrollTargetWithIndex_(index) {
-    this.scrollTarget = this.iterableTabs[index];
-  }
-
-  shiftFrame_() {
-    const shiftAmount = this.isRTL ?
-      this.currentTranslateOffset :
-      -this.currentTranslateOffset + this.scrollFrame.scrollLeft;
-
-    this.tabs.style.transform =
-      this.tabs.style.webkitTransform = `translateX(${shiftAmount}px)`;
-
-    this.updateIndicatorEnabledStates_();
-  }
-
-  updateIndicatorEnabledStates_() {
-    if (this.currentTranslateOffset === 0) {
-      this.shiftBackTarget.classList.add(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
-    } else {
-      this.shiftBackTarget.classList.remove(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
-    }
-
-    if (this.currentTranslateOffset + this.scrollFrame.offsetWidth > this.tabs.offsetWidth) {
-      this.shiftForwardTarget.classList.add(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
-    } else {
-      this.shiftForwardTarget.classList.remove(MDCTabBarScrollerFoundation.cssClasses.INDICATOR_DISABLED);
-    }
   }
 }

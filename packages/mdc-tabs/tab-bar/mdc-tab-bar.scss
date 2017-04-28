@@ -73,18 +73,10 @@
       }
     }
   }
-
-  @include mdc-rtl(".mdc-tab-bar") {
-    flex-direction: reverse-row;
-  }
 }
 
 .mdc-tab-bar--icons-with-text {
   height: 72px;
-
-  .mdc-tab {
-    flex-direction: column;
-  }
 }
 
 .mdc-tab-bar--indicator-primary,

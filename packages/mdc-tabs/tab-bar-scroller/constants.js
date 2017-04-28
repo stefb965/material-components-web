@@ -15,11 +15,9 @@
  */
 
 export const cssClasses = {
-  VISIBLE: 'mdc-tab-bar-scroller--visible',
-  FOCUSED_CHILD: 'mdc-tab-bar-scroller--focused-child',
   INDICATOR_FORWARD: 'mdc-tab-bar-scroller__indicator--forward',
   INDICATOR_BACK: 'mdc-tab-bar-scroller__indicator--back',
-  INDICATOR_DISABLED: 'mdc-tab-bar-scroller__indicator--disabled',
+  INDICATOR_ENABLED: 'mdc-tab-bar-scroller__indicator--enabled',
   TAB: 'mdc-tab',
 };
 

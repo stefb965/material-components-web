@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ export default class MDCTabBarFoundation extends MDCFoundation {
       setStyleForIndicator: (/* propertyName: string, value: string */) => {},
       getOffsetWidthForIndicator: () => /* number */ 0,
       notifyChange: (/* evtData: {activeTabIndex: number} */) => {},
-      getActiveTab: () => /* Element */ {},
       getNumberOfTabs: () => /* number */ 0,
       isTabActiveAtIndex: (/* index: number */) => /* boolean */ false,
       setTabActiveAtIndex: (/* index: number, isActive: true */) => {},
@@ -57,7 +56,6 @@ export default class MDCTabBarFoundation extends MDCFoundation {
     this.isIndicatorShown_ = false;
     this.computedWidth_ = 0;
     this.computedLeft_ = 0;
-    this.activeTab_ = null;
     this.activeTabIndex_ = 0;
     this.layoutFrame_ = 0;
     this.resizeHandler_ = () => this.layout();
@@ -67,7 +65,10 @@ export default class MDCTabBarFoundation extends MDCFoundation {
     this.adapter_.addClass(cssClasses.UPGRADED);
     this.adapter_.bindOnMDCTabSelectedEvent();
     this.adapter_.registerResizeHandler(this.resizeHandler_);
-    this.activeTab_ = this.adapter_.getActiveTab();
+    const activeTabIndex = this.findActiveTabIndex_();
+    if (activeTabIndex >= 0) {
+      this.activeTabIndex_ = activeTabIndex;
+    }
     this.layout();
   }
 
@@ -106,7 +107,6 @@ export default class MDCTabBarFoundation extends MDCFoundation {
       this.adapter_.getOffsetWidthForIndicator();
       this.adapter_.setStyleForIndicator('transition', '');
       this.adapter_.setStyleForIndicator('visibility', 'visible');
-      this.layout();
       this.isIndicatorShown_ = true;
     }
   }
@@ -120,10 +120,6 @@ export default class MDCTabBarFoundation extends MDCFoundation {
       this.layoutInternal_();
       this.layoutFrame_ = 0;
     });
-  }
-
-  getActiveTabIndex() {
-    return this.activeTabIndex_;
   }
 
   switchToTabAtIndex(index, shouldNotify) {

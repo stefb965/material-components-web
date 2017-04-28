@@ -1,7 +1,13 @@
-# MDC Tab Bar
+# MDC Tabs
 
-The MDC Tab Bar component is a spec-aligned tabbed navigation component adhering to the
-[Material Design tabs guidelines](https://material.io/guidelines/components/tabs.html).
+The MDC Tabs component contains components which are used to create spec-aligned tabbed navigation components adhering to the
+[Material Design tabs guidelines](https://material.io/guidelines/components/tabs.html). These components are:
+
+- **mdc-tab**: The individual tab elements
+- **mdc-tab-bar**: The main component which is composed of `mdc-tab` elements
+- **mdc-tab-bar-scroller**: An optional wrapper component around `mdc-tab-bar` which
+  provides arrow-based horizontal scrolling capability for tab bars which could overflow
+  the available width provided.
 
 ## Installation
 
@@ -9,10 +15,9 @@ The MDC Tab Bar component is a spec-aligned tabbed navigation component adhering
 npm install --save @material/tab-bar
 ```
 
-## Tab Bar usage
+## Tabs usage
 
-Tab Bar allow users to explore and switch between different views.
-MDC-Tab-Bar can be used as a CSS only component, or a more dynamic JavaScript
+`mdc-tab-bar` can be used as a CSS only component, or a more dynamic JavaScript
 component.
 
 There are also three different permutations of tab labels. These include text,
@@ -214,43 +219,37 @@ through tabs that have overflowed their available width).
 ##### ES2015
 
 ```javascript
-import {MDCTab, MDCTabFoundation} from 'mdc-tab';
-import {MDCTabBar, MDCTabBarFoundation} from 'mdc-tab-bar';
-import {MDCTabBarScroller, MDCTabBarScrollerFoundation} from 'mdc-tab-bar-scroller';
+import {MDCTab, MDCTabFoundation} from '@material/tabs';
+import {MDCTabBar, MDCTabBarFoundation} from '@material/tabs';
+import {MDCTabBarScroller, MDCTabBarScrollerFoundation} from '@material/tabs';
 ```
 
 ##### CommonJS
 
 ```javascript
-const mdcTab = require('mdc-tabs/tab');
-const MDCTab = mdcTab.MDCTab;
-const MDCTabFoundation = mdcTab.MDCTabFoundation;
+const mdcTabs = require('@material/tabs');
+const MDCTab = mdcTabs.MDCTab;
+const MDCTabFoundation = mdcTabs.MDCTabFoundation;
 
-const mdcTabBar = require('mdc-tabs/tab-bar');
-const MDCTabBar = mdcTabBar.MDCTabBar;
-const MDCTabBarFoundation = mdcTabBar.MDCTabBarFoundation;
+const MDCTabBar = mdcTabs.MDCTabBar;
+const MDCTabBarFoundation = mdcTabs.MDCTabBarFoundation;
 
-const mdcTabBarScroller = require('mdc-tabs/tab-bar-scroller');
-const MDCTabBarScroller = mdcTabBarScroller.MDCTabBarScroller;
-const MDCTabBarScrollerFoundation = mdcTabBarScroller.MDCTabBarScrollerFoundation;
+const MDCTabBarScroller = mdcTabs.MDCTabBarScroller;
+const MDCTabBarScrollerFoundation = mdcTabs.MDCTabBarScrollerFoundation;
 ```
 
 ##### AMD
 
 ```javascript
-require(['path/to/mdc-tabs/tab'], mdcTab => {
-  const MDCTab = mdcTab.MDCTab;
-  const MDCTabFoundation = mdcTab.MDCTabFoundation;
-});
+require(['path/to/@material/tabs'], mdcTabs => {
+  const MDCTab = mdcTabs.MDCTab;
+  const MDCTabFoundation = mdcTabs.MDCTabFoundation;
 
-require(['path/to/mdc-tabs/tab-bar'], mdcTabBar => {
-  const MDCTabBar = mdcTabBar.MDCTabBar;
-  const MDCTabBarFoundation = mdcTabBar.MDCTabBarFoundation;
-});
+  const MDCTabBar = mdcTabs.MDCTabBar;
+  const MDCTabBarFoundation = mdcTabs.MDCTabBarFoundation;
 
-require(['path/to/mdc-tabs/tab-bar-scroller'], mdcTabBarScroller => {
-  const MDCTabBarScroller = mdcTabBarScroller.MDCTabBarScroller;
-  const MDCTabBarScrollerFoundation = mdcTabBarScroller.MDCTabBarScrollerFoundation;
+  const MDCTabBarScroller = mdcTabs.MDCTabBarScroller;
+  const MDCTabBarScrollerFoundation = mdcTabs.MDCTabBarScrollerFoundation;
 });
 ```
 
@@ -258,13 +257,13 @@ require(['path/to/mdc-tabs/tab-bar-scroller'], mdcTabBarScroller => {
 
 ```javascript
 const MDCTab = mdc.tabs.MDCTab;
-const MDCTabFoundation = mdc.tab.MDCTabFoundation;
+const MDCTabFoundation = mdc.tabs.MDCTabFoundation;
 
-const MDCTabBar = mdc.tabBar.MDCTabBar;
-const MDCTabBarFoundation = mdc.tabBar.MDCTabBarFoundation;
+const MDCTabBar = mdc.tabs.MDCTabBar;
+const MDCTabBarFoundation = mdc.tabs.MDCTabBarFoundation;
 
-const MDCTabBarScroller = mdc.tabBar.MDCTabBarScroller;
-const MDCTabBarScrollerFoundation = mdc.tabBarScroller.MDCTabBarScrollerFoundation;
+const MDCTabBarScroller = mdc.tabs.MDCTabBarScroller;
+const MDCTabBarScrollerFoundation = mdc.tabs.MDCTabBarScrollerFoundation;
 ```
 
 #### Automatic Instantiation
@@ -273,14 +272,15 @@ If you do not care about retaining the component instance for the tabs, simply
 call `attachTo()` and pass it a DOM element.
 
 ```javascript
-mdc.tabBar.MDCTabBar.attachTo(document.querySelector('#my-mdc-tab-bar'));
+mdc.tabs.MDCTabBar.attachTo(document.querySelector('#my-mdc-tab-bar'));
 ```
 
 #### Manual Instantiation
 
 Tabs can easily be initialized using their default constructors as well, similar
 to `attachTo`. This process involves a factory to create an instance of MDCTab
-from each tab Element inside of the `mdc-tab-bar` node, e.g.:
+from each tab Element inside of the `mdc-tab-bar` node during the intialization phase
+of `MDCTabBar`, e.g.:
 
 ```html
 <nav id="my-mdc-tab-bar" class="mdc-tab-bar">
@@ -292,7 +292,7 @@ from each tab Element inside of the `mdc-tab-bar` node, e.g.:
 ```
 
 ```javascript
-import {MDCTabBar} from 'mdc-tab-bar';
+import {MDCTabBar, MDCTabBarFoundation} from '@material/tabs';
 
 const tabBar = new MDCTabBar(document.querySelector('#my-mdc-tab-bar'));
 ```
@@ -317,8 +317,6 @@ Broadcast when a user actions on the tab.
 MDC Tab ships with an `MDCTabFoundation` class that external frameworks and libraries can
 use to integrate the component. As with all foundation classes, an adapter object must be provided.
 
-> **NOTE**: Components themselves must manage adding ripples to dialog buttons, should they choose to
-do so. We provide instructions on how to add ripples to buttons within the [mdc-button README](https://github.com/material-components/material-components-web/tree/master/packages/mdc-button#adding-ripples-to-buttons).
 
 ### Adapter API
 
@@ -337,15 +335,15 @@ do so. We provide instructions on how to add ripples to buttons within the [mdc-
 
 #### MDCTabFoundation.getComputedWidth() => number
 
-Return computed width for tab
+Return the computed width for tab.
 
 #### MDCTabFoundation.getComputedLeft() => number
 
-Return computed left offset for tab
+Return the computed left offset for tab.
 
 #### MDCTabFoundation.isActive() => boolean
 
-Return true if tab is active
+Return true if tab is active.
 
 #### MDCTabFoundation.setActive(isActive = false) => void
 
@@ -370,22 +368,19 @@ Sets `computedWidth_` and `computedLeft_` for a tab.
 
 #### MDCTabBar.initialize() => void
 
-Gathers instances of MDC Tab.
+Instantiates `mdc-tab` components and initializes private properties
 
-#### MDCTabBar.initialSyncWithDOM() => void
-
-Syncs with tab selected in DOM
 
 ### Tab Bar Events
 
 #### MDCTabBar:change
 
-Broadcast when a user actions on a tab, causing a change in selected tab.
+Broadcast when a user actions on a tab, resulting in a change in the selected tab.
 
 
 ### Using the Foundation Class
 
-MDC Tab Bar ships with an `MDCTabBarFoundation` class that external frameworks
+`mdc-tab-bar` ships with an `MDCTabBarFoundation` class that external frameworks
 and libraries can use to integrate the component. As with all foundation
 classes, an adapter object must be provided.
 

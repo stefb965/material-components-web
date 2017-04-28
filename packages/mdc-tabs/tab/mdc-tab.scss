@@ -20,24 +20,9 @@
 @import "@material/ripple/mixins";
 @import "@material/rtl/mixins";
 
-$mdc-tabs-text-color: rgba(black, .54);
-$mdc-tabs-active-text-color: rgba(black, .87);
-
 @mixin mdc-tabs-icon-tab-content {
   display: block;
   margin: 0 auto;
-}
-
-@mixin mdc-tabs-anchor-reset {
-  color: $mdc-tabs-text-color;
-
-  &:hover {
-    color: $mdc-tabs-active-text-color;
-  }
-
-  &:focus {
-    outline-color: $mdc-tabs-text-color;
-  }
 }
 
 // postcss-bem-linter: define tab
@@ -83,7 +68,6 @@ $mdc-tabs-active-text-color: rgba(black, .87);
   @media screen and (max-width: 600px) {
     min-width: 72px;
     padding: 0 12px;
-    flex: 1;
   }
 
   // postcss-bem-linter: ignore
@@ -94,7 +78,7 @@ $mdc-tabs-active-text-color: rgba(black, .87);
     height: 24px;
 
     // postcss-bem-linter: ignore
-    .mdc-tabs--icons-with-text & {
+    .mdc-tab-bar--icons-with-text & {
       margin-top: 4px;
     }
   }

@@ -47,6 +47,7 @@
     align-items: center;
     justify-content: center;
     width: $mdc-tab-bar-scroller-indicator-width;
+    visibility: hidden;
 
     @include mdc-theme-prop(color, text-secondary-on-light);
 
@@ -87,8 +88,8 @@
     }
   }
 
-  &__indicator--disabled {
-    visibility: hidden;
+  &__indicator--enabled {
+    visibility: visible;
   }
 }
 

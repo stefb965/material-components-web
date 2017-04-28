@@ -17,6 +17,7 @@
 import MDCComponent from '@material/base/component';
 import {MDCRipple} from '@material/ripple';
 
+import {cssClasses} from './constants';
 import MDCTabFoundation from './foundation';
 
 export {MDCTabFoundation};
@@ -69,7 +70,15 @@ export class MDCTab extends MDCComponent {
       deregisterInteractionHandler: (type, handler) => this.root_.removeEventListener(type, handler),
       getOffsetWidth: () => this.root_.offsetWidth,
       getOffsetLeft: () => this.root_.offsetLeft,
-      notifySelected: () => this.emit('MDCTab:selected', {tab: this}),
+      notifySelected: () => this.emit('MDCTab:selected', {tab: this}, true),
     });
+  }
+
+  initialSyncWithDOM() {
+    this.isActive = this.root_.classList.contains(cssClasses.ACTIVE);
+  }
+
+  measureSelf() {
+    this.foundation_.measureSelf();
   }
 }
