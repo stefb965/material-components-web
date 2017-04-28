@@ -94,8 +94,8 @@ export class MDCTabBarScroller extends MDCComponent {
         this.getRTLNormalizedOffsetLeftForTab_(target),
       computedWidthForTabAtIndex: (index) => this.iterableTabs[index].offsetWidth,
       computedLeftForTabAtIndex: (index) => this.iterableTabs[index].offsetLeft,
-      computedScrollFrameWidth: (index) => this.computedFrameWidth_,
-      updateScrollTargetToTabAtIndex: (index) => this.updateScrollTargetWithIndex_(index),
+      computedScrollFrameWidth: () => this.computedFrameWidth_,
+      updateScrollTargetToTabAtIndex: (index) => this.setScrollTargetWithIndex_(index),
       currentTranslateOffset: () => this.currentTranslateOffset,
       scrollToTab: () => this.scrollToTab_(),
       setFocusedTarget: (target) => (this.currentFocusedTarget = target),
@@ -105,38 +105,8 @@ export class MDCTabBarScroller extends MDCComponent {
     });
   }
 
-  // checkForNewLayout_(evt) {
-  //   if (!evt.target.classList.contains(MDCTabBarScrollerFoundation.cssClasses.TAB)) {
-  //     return;
-  //   }
-  //
-  //   const tab = evt.target;
-  //   const focusOffset = tab.offsetLeft + tab.offsetWidth;
-  //   const translateOffset = this.currentTranslateOffset_ + this.scrollFrame.offsetWidth;
-  //
-  //   if (this.isRTL) {
-  //     if (this.getRTLNormalizedOffsetLeftForTab_(tab) + tab.offsetWidth > translateOffset) {
-  //       this.foundation_.scrollForward();
-  //     }
-  //
-  //     if (this.getRTLNormalizedOffsetLeftForTab_(tab) < this.currentTranslateOffset_) {
-  //       this.foundation_.scrollBack();
-  //     }
-  //   }
-  //   else {
-  //     if (tab.offsetLeft > translateOffset) {
-  //       this.foundation_.scrollForward();
-  //     }
-  //
-  //     if (tab.offsetLeft < this.currentTranslateOffset_) {
-  //       this.foundation_.scrollBack();
-  //     }
-  //   }
-  // }
-
   layout_() {
     this.computedFrameWidth_ = this.scrollFrame.offsetWidth;
-
     const isOverflowing = this.tabs.offsetWidth > this.computedFrameWidth_;
 
     if (isOverflowing) {
@@ -162,13 +132,13 @@ export class MDCTabBarScroller extends MDCComponent {
     return this.tabs.offsetWidth - (tab.offsetLeft + tab.offsetWidth);
   }
 
-  updateScrollTargetWithIndex_(index) {
+  setScrollTargetWithIndex_(index) {
     this.scrollTarget = this.iterableTabs[index];
   }
 
   shiftFrame_() {
     const shiftAmount = this.isRTL ?
-      this.currentTranslateOffset - this.scrollFrame.scrollLeft :
+      this.currentTranslateOffset :
       -this.currentTranslateOffset + this.scrollFrame.scrollLeft;
 
     this.tabs.style.transform =

@@ -59,7 +59,6 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
   constructor(adapter) {
     super(Object.assign(MDCTabBarScrollerFoundation.defaultAdapter, adapter));
 
-    this.currentTranslateOffset_ = 0;
     this.forwardIndicatorClickHandler = () => this.scrollForward();
     this.backIndicatorClickHandler = () => this.scrollBack();
     this.focusHandler = (evt) => this.checkForNewLayout_(evt);
@@ -76,7 +75,7 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
     this.adapter_.deregisterBackIndicatorInteractionHandler(this.backIndicatorClickHandler);
     this.adapter_.deregisterForwardIndicatorInteractionHandler(this.forwardIndicatorClickHandler);
     this.adapter_.deregisterWindowResizeHandler(this.adapter_.triggerNewLayout);
-    this.adapter_.deregisterFocusInteractionHandler(this.focusEventHandler);
+    this.adapter_.deregisterFocusInteractionHandler(this.focusHandler);
   }
 
   scrollBack() {
@@ -141,7 +140,6 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
 
     this.adapter_.setFocusedTarget(evt.target);
 
-    const focusOffset = this.adapter_.focusedTargetComputedLeft() + this.adapter_.focusedTargetComputedWidth();
     const translateOffset = this.adapter_.currentTranslateOffset();
 
     if (this.adapter_.isRTL()) {
@@ -150,11 +148,11 @@ export default class MDCTabBarScrollerFoundation extends MDCFoundation {
         this.scrollForward();
       }
 
-      if (this.adapter_.rtlNormalizedOffsetLeftForFocusedTarget(this.adapter_.focusedTarget()) < this.adapter_.currentTranslateOffset()) {
+      if (this.adapter_.rtlNormalizedOffsetLeftForFocusedTarget(this.adapter_.focusedTarget()) <
+          this.adapter_.currentTranslateOffset()) {
         this.scrollBack();
       }
-    }
-    else {
+    } else {
       if (this.adapter_.focusedTargetComputedLeft() > translateOffset) {
         this.scrollForward();
       }

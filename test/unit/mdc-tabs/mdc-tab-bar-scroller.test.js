@@ -19,7 +19,6 @@ import bel from 'bel';
 import domEvents from 'dom-events';
 import td from 'testdouble';
 import {createMockRaf} from '../helpers/raf';
-import {supportsCssVariables} from '../../../packages/mdc-ripple/util';
 import {MDCTabBarScroller} from '../../../packages/mdc-tabs/tab-bar-scroller';
 
 function getFixture() {
@@ -58,6 +57,7 @@ function setupTest() {
   const fixture = getFixture();
   const root = fixture.querySelector('.mdc-tab-bar-scroller');
   const tabs = fixture.querySelector('.mdc-tab-bar-scroller__scroll-frame__tabs');
+  const iterableTabs = [].slice.call(tabs.querySelectorAll('.mdc-tab'));
   const backIndicator =
     fixture.querySelector('.mdc-tab-bar-scroller__indicator--back');
   const forwardIndicator =
@@ -67,7 +67,7 @@ function setupTest() {
 
   const component = new MDCTabBarScroller(root);
 
-  return {fixture, root, backIndicator, forwardIndicator, scrollFrame, tabs, component};
+  return {fixture, root, backIndicator, forwardIndicator, scrollFrame, tabs, iterableTabs, component};
 }
 
 suite('MDCTabBarScroller');
@@ -105,7 +105,28 @@ test('adapter#registerForwardIndicatorInteractionHandler', () => {
   td.verify(handler(td.matchers.anything()));
 });
 
-test('adapter#registerResizeHandler adds resize listener to the component', () => {
+test('adapter#registerFocusInteractionHandler adds focus listener to the component', () => {
+  const {component, root} = setupTest();
+  const handler = td.func('focusHandler');
+
+  component.getDefaultFoundation().adapter_.registerFocusInteractionHandler(handler);
+  domEvents.emit(root, 'focus');
+
+  td.verify(handler(td.matchers.anything()));
+});
+
+test('adapter#deregisterFocusInteractionHandler removes focus listener from the component', () => {
+  const {component} = setupTest();
+  const handler = td.func('focusHandler');
+
+  component.root_.addEventListener('focus', handler);
+  component.getDefaultFoundation().adapter_.deregisterFocusInteractionHandler(handler);
+  domEvents.emit(window, 'focus');
+
+  td.verify(handler(td.matchers.anything()), {times: 0});
+});
+
+test('adapter#registerWindowResizeHandler adds resize listener to the component', () => {
   const {component} = setupTest();
   const handler = td.func('resizeHandler');
 
@@ -115,7 +136,7 @@ test('adapter#registerResizeHandler adds resize listener to the component', () =
   td.verify(handler(td.matchers.anything()));
 });
 
-test('adapter#deregisterResizeHandler removes resize listener from component', () => {
+test('adapter#deregisterWindowResizeHandler removes resize listener from component', () => {
   const {component} = setupTest();
   const handler = td.func('resizeHandler');
 
@@ -126,39 +147,100 @@ test('adapter#deregisterResizeHandler removes resize listener from component', (
   td.verify(handler(td.matchers.anything()), {times: 0});
 });
 
-// // TODO: sheehana test scrollBack, scrollForward
-// if (supportsCssVariables(window)) {
-//   test.only('adapter#scrollBack decreases translateX of tab group', () => {
-//     const {component, scrollFrame} = setupTest();
-//     const rtlContext = false;
-//     const raf = createMockRaf();
+test('adapter#triggerNewLayout lays out scroller components', () => {});
+
+test('adapter#numberOfTabs returns the number of tabs in tab bar', () => {
+  const {component} = setupTest();
+
+  assert.equal(component.getDefaultFoundation().adapter_.numberOfTabs(), 9);
+});
+
+// TODO: sheehana
+// test('adapter#rtlNormalizedOffsetLeftForTabAtIndex returns distance between ' +
+//   'right edge of tab and right edge of container', () => {
+//   const {component} = setupTest();
+//   const tabIndex = 0;
+// });
 //
-//     scrollFrame.style.width = '40px';
-//     component.getDefaultFoundation().adapter_.triggerNewLayout();
-//     raf.flush();
-//
-//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
-//     raf.flush();
-//
-//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-//     raf.restore();
-//
-//     component.getDefaultFoundation().adapter_.scrollBack(rtlContext);
-//     raf.flush();
-//
-//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-//     raf.restore();
-//   });
-//
-//   test('adapter#scrollForward increases translateX of tab group', () => {
-//     const {component} = setupTest();
-//     const rtlContext = false;
-//     const raf = createMockRaf();
-//
-//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
-//     raf.flush();
-//
-//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
-//     raf.restore();
-//   });
-// }
+// test('adapter#rtlNormalizedOffsetLeftForFocusedTarget returns distance between ' +
+//           'right edge of tab and right edge of container', () => {
+//   const {component} = setupTest();
+// });
+
+test('adapter#computedWidthForTabAtIndex returns the width for the tab at ' +
+  'a given index', () => {
+  const {component, iterableTabs} = setupTest();
+  const tabIndex = 0;
+
+  assert.equal(component.getDefaultFoundation().adapter_.computedWidthForTabAtIndex(tabIndex),
+    iterableTabs[tabIndex].offsetWidth);
+});
+
+test('adapter#computedLeftForTabAtIndex returns the left offset for the tab at' +
+  'a given index', () => {
+  const {component, iterableTabs} = setupTest();
+  const tabIndex = 0;
+
+  assert.equal(component.getDefaultFoundation().adapter_.computedLeftForTabAtIndex(tabIndex),
+    iterableTabs[tabIndex].offsetLeft);
+});
+
+test('adapter#computedScrollFrameWidth returns the width of the scroll frame', () => {
+  const {component, scrollFrame} = setupTest();
+
+  assert.equal(component.getDefaultFoundation().adapter_.computedScrollFrameWidth(), scrollFrame.offsetWidth);
+});
+
+test('adapter#updateScrollTargetToTabAtIndex sets scroll target', () => {
+  const {component, iterableTabs} = setupTest();
+  const tabIndex = 1;
+
+  component.getDefaultFoundation().adapter_.updateScrollTargetToTabAtIndex(tabIndex);
+  assert.equal(component.scrollTarget, iterableTabs[tabIndex]);
+});
+
+test('adapter#currentTranslateOffset returns the current translateOffset', () => {
+  const {component} = setupTest();
+
+  assert.equal(component.getDefaultFoundation().adapter_.currentTranslateOffset(), component.currentTranslateOffset);
+});
+
+test('adapter#scrollToTab scrolls to the current scroll target', () => {
+  const {component, iterableTabs} = setupTest();
+  const raf = createMockRaf();
+
+  component.getDefaultFoundation().adapter_.updateScrollTargetToTabAtIndex(1);
+  component.getDefaultFoundation().adapter_.scrollToTab();
+  raf.flush();
+
+  assert.equal(component.currentTranslateOffset, iterableTabs[1].offsetLeft);
+  raf.restore();
+});
+
+test('adapter#setFocusedTarget sets currentFocusedTarget to a given target', () => {
+  const {component, iterableTabs} = setupTest();
+
+  component.getDefaultFoundation().adapter_.setFocusedTarget(iterableTabs[1]);
+  assert.equal(component.currentFocusedTarget, iterableTabs[1]);
+});
+
+test('adapter#focusedTarget returns the currently focused target', () => {
+  const {component, iterableTabs} = setupTest();
+
+  component.getDefaultFoundation().adapter_.setFocusedTarget(iterableTabs[1]);
+  assert.equal(component.getDefaultFoundation().adapter_.focusedTarget(), iterableTabs[1]);
+});
+
+test('adapter#focusedTargetComputedWidth returns width of focused target', () => {
+  const {component, iterableTabs} = setupTest();
+
+  component.getDefaultFoundation().adapter_.setFocusedTarget(iterableTabs[1]);
+  assert.equal(component.getDefaultFoundation().adapter_.focusedTargetComputedWidth(), iterableTabs[1].offsetWidth);
+});
+
+test('adapter#focusedTargetComputedLeft returns left offset of focused target', () => {
+  const {component, iterableTabs} = setupTest();
+
+  component.getDefaultFoundation().adapter_.setFocusedTarget(iterableTabs[1]);
+  assert.equal(component.getDefaultFoundation().adapter_.focusedTargetComputedLeft(), iterableTabs[1].offsetLeft);
+});

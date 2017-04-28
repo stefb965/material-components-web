@@ -15,7 +15,6 @@
  */
 
 import MDCComponent from '@material/base/component';
-import MDCRippleFoundation from '@material/ripple/foundation';
 import {MDCRipple} from '@material/ripple';
 
 import MDCTabFoundation from './foundation';

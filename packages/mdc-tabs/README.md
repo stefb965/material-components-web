@@ -442,25 +442,6 @@ Updates the active tab to be the tab at the given index, emits `MDCTabBar:change
 
 Sets data regarding which instance of MDC Tab Bar will be scrollable.
 
-#### MDCTabBarScroller.layout() => void
-
-Lays out left and right indicators, prepares logic for shifting tabs in the scroll frame.
-
-#### MDCTabBarScroller.scrollLeft() => void
-
-Scrolls tabs left. If clicked, tabs will shift to the left, revealing tabs previously overflowed to the right.
-This reverses if tabs are in an RTL context.
-
-#### MDCTabBarScroller.scrollRight() => void
-
-Scrolls tabs right. If clicked, tabs will shift to the right, revealing tabs previously overflowed to the left.
-This reverses if tabs are in an RTL context.
-
-#### MDCTabBarScroller.scrollToTab(tab: MDCTab) => void
-
-Shifts to a given tab.
-
-
 ### Using the Foundation Class
 
 MDC Tab Bar Scroller ships with an `MDCTabBarScrollerFoundation` class that
@@ -477,19 +458,36 @@ all foundation classes, an adapter object must be provided.
 | `deregisterLeftIndicatorInteractionHandler(handler: EventHandler) => void` | Deregisters an event listener from the shift left indicator. |
 | `registerRightIndicatorInteractionHandler(handler: EventHandler) => void` | Registers an event listener on the shift right indicator. |
 | `deregisterRightIndicatorInteractionHandler(handler: EventHandler) => void` | Deregisters an event listener from the shift right indicator. |
+| `registerFocusInteractionHandler(handler: EventHandler) => void` | Registers a focus event listener on the component. |
+| `deregisterFocusInteractionHandler(handler: EventHandler) => void` | Deregisters a focus event event listener from the component. |
 | `registerWindowResizeHandler(handler) => void` | Registers an `resize` event listener on the `window` |
 | `deregisterWindowResizeHandler(handler) => void` | Deregisters an `resize` event listener from the `window` |
 | `triggerNewLayout() => void` | Triggers a new layout render |
-| `scrollLeft(isRTL: boolean) => void` | Scrolls left if isRTL is false. Scrolls right otherwise |
-| `scrollRight(isRTL: boolean) => void` | Scrolls right if isRTL is false. Scrolls left otherwise |
+| `numberOfTabs() => number` | Returns the number of tabs in the tab bar |
+| `rtlNormalizedOffsetLeftForTabAtIndex(index: number) => number` | Returns an RTL normalized offsetLeft for a tab at a given index |
+| `rtlNormalizedOffsetLeftForFocusedTarget(target: Element) => number` | Returns an RTL normalized offsetLeft for a given tab. |
+| `computedWidthForTabAtIndex(index: number) => number` | Returns the width for a tab at a given index. |
+| `computedLeftForTabAtIndex(index: number) => number` | Returns the left offset for a tab at a given index. |
+| `computedScrollFrameWidth() => number` | Returns the width of the scroll frame. |
+| `updateScrollTargetToTabAtIndex(index: number) => void` | Sets the scroll target to a tab at the given index. |
+| `currentTranslateOffset() => number` | Returns the current translate offset, e.g.: how far the tabs are currently scrolled. |
+| `scrollToTab() => void` | Scrolls tabs such that the `currentScrollTarget` becomes the left most tab. |
+| `setFocusedTarget(target: Element) => void` | Sets the `currentFocusedTarget` to be the currently focused tab. |
+| `focusedTarget() => Element` | Returns the currently focused tab. |
+| `focusedTargetComputedWidth() => number` | Returns the width of the currently focused tab. |
+| `focusedTargetComputedLeft() => number` | Returns the left offset of the currently focused tab. |
 
 
 ### The full foundation API
 
-#### MDCTabBarScrollerFoundation.scrollRight(isRTL) => void
+#### MDCTabBarScrollerFoundation.scrollBack() => void
 
-Calls the adapters `scrollRight()` method and passes RTL context as an argument.
+Scrolls the tabs such that the tab which was previously cut off on the _back_ side of the scroll frame is fully visible.
 
-#### MDCTabBarScrollerFoundation.scrollLeft(isRTL) => void
+#### MDCTabBarScrollerFoundation.scrollForward() => void
 
-Calls the adapters `scrollLeft()` method and passes RTL context as an argument.
+Scrolls the tabs such that the tab which was previously cut off on the _forward_ side of the scroll frame is fully visible.
+
+#### MDCTabBarScrollerFoundation.isRTL() => boolean
+
+Returns the true if the component exists within an RTL context. False otherwise.

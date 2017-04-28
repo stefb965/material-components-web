@@ -33,8 +33,14 @@ test('default adapter returns a complete adapter implementation', () => {
     'deregisterBackIndicatorInteractionHandler',
     'registerForwardIndicatorInteractionHandler',
     'deregisterForwardIndicatorInteractionHandler',
+    'registerFocusInteractionHandler', 'deregisterFocusInteractionHandler',
     'registerWindowResizeHandler', 'deregisterWindowResizeHandler',
-    'triggerNewLayout', 'scrollBack', 'scrollForward',
+    'triggerNewLayout', 'numberOfTabs', 'rtlNormalizedOffsetLeftForTabAtIndex',
+    'rtlNormalizedOffsetLeftForFocusedTarget', 'computedWidthForTabAtIndex',
+    'computedLeftForTabAtIndex', 'computedScrollFrameWidth',
+    'updateScrollTargetToTabAtIndex', 'currentTranslateOffset', 'scrollToTab',
+    'setFocusedTarget', 'focusedTarget', 'focusedTargetComputedWidth',
+    'focusedTargetComputedLeft',
   ]);
 });
 
@@ -56,6 +62,7 @@ test('#init registers interaction and resize handlers', () => {
   td.verify(mockAdapter.registerBackIndicatorInteractionHandler(isA(Function)));
   td.verify(mockAdapter.registerForwardIndicatorInteractionHandler(isA(Function)));
   td.verify(mockAdapter.registerWindowResizeHandler(isA(Function)));
+  td.verify(mockAdapter.registerFocusInteractionHandler(isA(Function)));
 });
 
 test('#destroy deregisters interaction and resize handlers', () => {
@@ -67,24 +74,42 @@ test('#destroy deregisters interaction and resize handlers', () => {
   td.verify(mockAdapter.deregisterBackIndicatorInteractionHandler(isA(Function)));
   td.verify(mockAdapter.deregisterForwardIndicatorInteractionHandler(isA(Function)));
   td.verify(mockAdapter.deregisterWindowResizeHandler(isA(Function)));
+  td.verify(mockAdapter.deregisterFocusInteractionHandler(isA(Function)));
 });
 
-test('#scrollBack calls scroll back', () => {
-  const {foundation, mockAdapter} = setupTest();
-  const {isA} = td.matchers;
-  const rtlContext = false;
-
-  foundation.scrollBack(rtlContext);
-
-  td.verify(mockAdapter.scrollBack(isA(Boolean)));
-});
-
-test('#scrollForward calls scroll forward', () => {
-  const {foundation, mockAdapter} = setupTest();
-  const {isA} = td.matchers;
-  const rtlContext = false;
-
-  foundation.scrollForward(rtlContext);
-
-  td.verify(mockAdapter.scrollForward(isA(Boolean)));
-});
+// // TODO: sheehana test scrollBack, scrollForward
+// if (supportsCssVariables(window)) {
+//   test.only('#scrollBack decreases translateX of tab group', () => {
+//     const {component, scrollFrame} = setupTest();
+//     const rtlContext = false;
+//     const raf = createMockRaf();
+//
+//     scrollFrame.style.width = '40px';
+//     component.getDefaultFoundation().adapter_.triggerNewLayout();
+//     raf.flush();
+//
+//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//
+//     component.getDefaultFoundation().adapter_.scrollBack(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//   });
+//
+//   test('#scrollForward increases translateX of tab group', () => {
+//     const {component} = setupTest();
+//     const rtlContext = false;
+//     const raf = createMockRaf();
+//
+//     component.getDefaultFoundation().adapter_.scrollForward(rtlContext);
+//     raf.flush();
+//
+//     assert.isTrue(component.tabs.style.webkitTransform === 'translateX(0px)');
+//     raf.restore();
+//   });
+// }
